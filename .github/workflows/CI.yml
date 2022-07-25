@@ -54,6 +54,6 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using IPF
-            DocMeta.setdocmeta!(IPF, :DocTestSetup, :(using IPF); recursive=true)
-            doctest(IPF)'
+            using ItPropFit
+            DocMeta.setdocmeta!(ItPropFit, :DocTestSetup, :(using ItPropFit); recursive=true)
+            doctest(ItPropFit)'

@@ -1,16 +1,16 @@
-using IPF
+using ItPropFit
 using Documenter
 
-DocMeta.setdocmeta!(IPF, :DocTestSetup, :(using IPF); recursive=true)
+DocMeta.setdocmeta!(ItPropFit, :DocTestSetup, :(using ItPropFit); recursive=true)
 
 makedocs(;
-    modules=[IPF],
+    modules=[ItPropFit],
     authors="Erik-Jan van Kesteren",
-    repo="https://github.com/vankesteren/IPF.jl/blob/{commit}{path}#{line}",
-    sitename="IPF.jl",
+    repo="https://github.com/vankesteren/ItPropFit.jl/blob/{commit}{path}#{line}",
+    sitename="ItPropFit.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://vankesteren.github.io/IPF.jl",
+        canonical="https://vankesteren.github.io/ItPropFit.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -20,6 +20,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/vankesteren/IPF.jl",
+    repo="github.com/vankesteren/ItPropFit.jl",
     devbranch="main",
 )

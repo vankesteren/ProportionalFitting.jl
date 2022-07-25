@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = IPF
+CurrentModule = ItPropFit
 ```
 
-# IPF
+# ItPropFit
 
-Documentation for [IPF](https://github.com/vankesteren/IPF.jl).
+Documentation for [ItPropFit](https://github.com/vankesteren/ItPropFit.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [IPF]
+Modules = [ItPropFit]
 ```

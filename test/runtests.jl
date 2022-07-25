@@ -1,4 +1,4 @@
-using Test, IPF, Random
+using Test, ItPropFit, Random
 
 Random.seed!(45)
 

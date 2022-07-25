@@ -33,7 +33,7 @@ git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
 version = "0.2.2"
 
-[[deps.IPF]]
+[[deps.ItPropFit]]
 path = ".."
 uuid = "7a994e6b-35c0-41b3-a964-b7f62fc12992"
 version = "0.1.0"
