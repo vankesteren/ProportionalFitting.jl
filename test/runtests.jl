@@ -1,6 +1,4 @@
-using Test, ItPropFit, Random
-
-Random.seed!(45)
+using Test, ItPropFit
 
 @testset "Two-dimensional case" begin
     # Basic example
@@ -12,8 +10,8 @@ Random.seed!(45)
     @test margins(Array(AF) .* X) ≈ [u, v]
 
     # Large 100 x 100 matrix
-    X = round.(rand(100, 100) * 20)
-    Y = round.(X + (rand(100, 100) .- 0.5) .* 5)
+    X = reshape(repeat(1:16, 625), 100, 100)
+    Y = reshape(repeat(1:5, 2000), 100, 100) + X
     m = margins(Y)
     
     AF = ipf(X, m)
@@ -22,15 +20,15 @@ end
 
 @testset "Multidimensional case" begin
     # Small three-dimensional case
-    X = round.(rand(2, 3, 2) * 20)
-    Y = round.(X + (rand(2, 3, 2) .- 0.5) .* 5)
+    X = reshape(1:12, 2, 3, 2)
+    Y = reshape(repeat(1:4, 3), 2, 3, 2) + X
     m = margins(Y)
     AF = ipf(X, m)
     @test margins(Array(AF) .* X) ≈ m
 
     # large six-dimensional case
-    X = round.(rand(6, 4, 2, 5, 5) * 20)
-    Y = round.(X + (rand(6, 4, 2, 5, 5) .- 0.5) .* 5)
+    X = reshape(repeat(1:12, 100), 6, 4, 2, 5, 5)
+    Y = reshape(repeat(1:5, 240), 6, 4, 2, 5, 5) + X
     m = margins(Y)
     AF = ipf(X, m)
     @test margins(Array(AF) .* X) ≈ m
