@@ -1,8 +1,8 @@
 module ItPropFit
-export ArrayFactors, ipf, margins
+export ipf, ArrayFactors, margins
 
-include("ArrayFactors.jl")
 include("ipf.jl")
+include("ArrayFactors.jl")
 include("utils.jl")
 
 end # module

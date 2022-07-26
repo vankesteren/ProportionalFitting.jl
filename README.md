@@ -1,2 +1,5 @@
 # ItPropFit.jl
- Multidimensional iterative proportional fitting in Julia
+
+[![CI](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml)
+
+Multidimensional iterative proportional fitting in Julia. See the documentation [here](https://vankesteren.github.io/ItPropFit.jl/).

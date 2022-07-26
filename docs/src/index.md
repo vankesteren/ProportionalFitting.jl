@@ -1,6 +1,10 @@
 # ItPropFit
 
-Documentation for [ItPropFit](https://github.com/vankesteren/ItPropFit.jl): multidimensional iterative proportional fitting (RAS algorithm, raking) in Julia. This package implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)). 
+Multidimensional iterative proportional fitting in Julia. 
+
+[ItPropFit](https://github.com/vankesteren/ItPropFit.jl): implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)) for performing iterative proportional fitting (also called RAS algorithm, raking, matrix scaling). 
+
+In the two-dimensional case, iterative proportional fitting means changing a matrix $X$ to have marginal sum totals $u, v$. One prime use is in survey data analysis, where $X$ could be your data's cross-tabulation of demographic characteristics, and $u, v$ the known population proportions of those characteristics.
 
 ## Getting started
 
@@ -16,7 +20,7 @@ X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
  20  30   40   50
 ```
 
-And the row and column margins of a matrix `Y` (`u` and `v`, respectively) but not the full matrix:
+And the row and column margins of another matrix `Y` (`u` and `v`, respectively) but not the full matrix:
 ```julia
 u = [150, 300, 400, 150]
 v = [200, 300, 400, 100]
