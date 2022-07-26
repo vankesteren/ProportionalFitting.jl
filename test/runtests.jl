@@ -21,8 +21,7 @@ end
 @testset "Multidimensional case" begin
     # Small three-dimensional case
     X = reshape(1:12, 2, 3, 2)
-    Y = reshape(repeat(1:4, 3), 2, 3, 2) + X
-    m = margins(Y)
+    m = [[40, 60], [28, 36, 44], [34, 74]]
     AF = ipf(X, m)
     @test margins(Array(AF) .* X) ≈ m
 
