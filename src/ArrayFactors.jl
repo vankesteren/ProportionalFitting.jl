@@ -4,7 +4,7 @@
 Array factors are defined such that the array's elements are their products:
 `M[i, j, ..., l] = f[1][i] * f[2][j] * ... * f[3][l]`
 
-see also: [`ipf`](@ref), [`margins`](@ref)
+see also: [`ipf`](@ref), [`margins`](@ref), [`Array`](@ref)
 
 # Fields
 - `f::Vector{Vector{<:Real}}`: Vector of array factors
@@ -26,13 +26,13 @@ julia> Array(AF)
  12  15
 ```
 """
-struct ArrayFactors
-    f::Vector{Vector{<:Real}}
+struct ArrayFactors{T}
+    f::Vector{Vector{T}}
 end
 
 # Methods
-function Base.eltype(A::ArrayFactors)
-    eltype(A.f[1])
+function Base.eltype(::Type{ArrayFactors{T}}) where {T}
+    return T
 end
 
 function Base.show(io::IO, A::ArrayFactors)
@@ -43,10 +43,38 @@ function Base.show(io::IO, A::ArrayFactors)
     end
 end
 
-function Base.Array(A::ArrayFactors)
+"""
+    Array(A::ArrayFactors{T})
+
+Create an array out of an ArrayFactors object.
+
+# Arguments
+- `A::ArrayFactors{T}`: Array factors
+
+# Examples
+```julia-repl
+julia> fac = ArrayFactors([[1,2,3], [4,5], [6,7]])
+Factors for array of size (3, 2, 2):
+    1: [1, 2, 3]
+    2: [4, 5]
+    3: [6, 7]
+
+julia> Array(fac)
+3×2×2 Array{Int64, 3}:
+[:, :, 1] =
+ 24  30
+ 48  60
+ 72  90
+
+[:, :, 2] =
+ 28   35
+ 56   70
+ 84  105
+```
+"""
+function Base.Array(A::ArrayFactors{T}) where {T}
     D = length(A.f)
-    D_len = length.(A.f)
-    M = ones(eltype(A), D_len...)
+    M = ones(T, length.(A.f)...)
     for idx in CartesianIndices(M)
         for d in 1:D
             M[idx] *= A.f[d][idx[d]]
