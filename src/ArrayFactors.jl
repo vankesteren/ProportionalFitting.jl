@@ -7,7 +7,7 @@ Array factors are defined such that the array's elements are their products:
 see also: [`ipf`](@ref), [`margins`](@ref), [`Array`](@ref)
 
 # Fields
-- `f::Vector{Vector{<:Real}}`: Vector of array factors
+- `f::Vector{Vector{T}}`: Vector of array factors
 
 # Examples
 ```julia-repl
