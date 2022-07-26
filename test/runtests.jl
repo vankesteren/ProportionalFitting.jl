@@ -1,6 +1,12 @@
 using Test, ItPropFit
 
-@testset "Two-dimensional case" begin
+@testset "Array factor methods" begin
+    fac = ArrayFactors([[1,2,3], [4,5]])
+    @test Array(fac) == [4 5 ; 8 10 ; 12 15]
+    @test eltype(fac) == Int64
+end
+
+@testset "Two-dimensional ipf" begin
     # Basic example
     X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
     u = [150, 300, 400, 150]
@@ -18,7 +24,7 @@ using Test, ItPropFit
     @test margins(Array(AF) .* X) ≈ m
 end
 
-@testset "Multidimensional case" begin
+@testset "Multidimensional ipf" begin
     # Small three-dimensional case
     X = reshape(1:12, 2, 3, 2)
     m = [[48, 60], [28, 36, 44], [34, 74]]

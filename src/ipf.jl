@@ -43,12 +43,24 @@ function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::I
         throw(DimensionMismatch("The size of the margins $D_len needs to equal size(X) = $(size(X))."))
     end
 
+    # margin consistency check
+    marsums = sum.(mar)
+    if (maximum(marsums) - minimum(marsums)) > tol
+        # transform to proportions
+        @info "Inconsistent target margins, converting `X` and `mar` to proportions. Margin totals: $marsums" 
+        X /= sum(X)
+        mar = convert.(Vector{Float64}, mar) ./ marsums
+    end
+
     # initialization (simplified first iteration)
     fac = [mar[d] ./ vec(sum(X; dims = setdiff(1:D, d))) for d in 1:D]
     X_prod = copy(X)
 
     # start iteration
+    iter = 0
+    crit = 0.
     for i in 1:maxiter
+        iter += 1
         oldfac = deepcopy(fac)
 
         for d in 1:D
@@ -73,9 +85,12 @@ function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::I
         # convergence check
         crit = maximum(broadcast(x -> maximum(abs.(x)), fac - oldfac))
         if crit < tol break end
-        if i == maxiter
-            throw(ErrorException("Did not converge. Try increasing the number of iterations."))
-        end
+    end
+
+    if iter == maxiter
+        @warn "Did not converge. Try increasing the number of iterations. Maximum absolute difference between subsequent iterations: $crit" 
+    else 
+        @info "Converged in $iter iterations."
     end
 
     return ArrayFactors(fac)
