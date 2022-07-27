@@ -2,7 +2,7 @@
 
 Multidimensional iterative proportional fitting in Julia. 
 
-[ItPropFit](https://github.com/vankesteren/ItPropFit.jl): implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)) for performing iterative proportional fitting (also called RAS algorithm, raking, matrix scaling). 
+[ItPropFit](https://github.com/vankesteren/ItPropFit.jl) implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)) for performing iterative proportional fitting (also called RAS algorithm, raking, matrix scaling). 
 
 In the two-dimensional case, iterative proportional fitting means changing a matrix $X$ to have marginal sum totals $u, v$. One prime use is in survey data analysis, where $X$ could be your data's cross-tabulation of demographic characteristics, and $u, v$ the known population proportions of those characteristics.
 
@@ -31,6 +31,7 @@ Then the `ipf` function from ItPropFit will find the array factors which adjust 
 fac = ipf(X, [u, v])
 ```
 ```
+[ Info: Converged in 8 iterations.
 Factors for array of size (4, 4):
   1: [0.9986403503185242, 0.8833622306385376, 1.1698911437112522, 0.8895042701910321]
   2: [1.616160156063788, 1.5431801747375655, 1.771623700829941, 0.38299396265192226]
@@ -104,6 +105,7 @@ Now we can run `ipf` to compute the adjustment:
 fac = ipf(X, m)
 ```
 ```
+[ Info: Converged in 8 iterations.
 Factors for array of size (2, 3, 2):
   1: [0.7012649814229596, 0.7413620380098563]
   2: [1.59452605457307, 1.3830398765538434, 1.2753933840995484]
@@ -126,48 +128,3 @@ Array(fac) .* X
  12.1811  13.2068  14.6147
 ```
 
-## Benchmarks
-```julia
-using BenchmarkTools, ItPropFit
-```
-
-### Default example
-```julia
-X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
-u = [150, 300, 400, 150]
-v = [200, 300, 400, 100]
-@benchmark ipf(X, [u, v])
-```
-```
-Range (min … max):  141.600 μs …   5.430 ms  ┊ GC (min … max): 0.00% … 95.50%
-Time  (median):     164.600 μs               ┊ GC (median):    0.00%
-Time  (mean ± σ):   172.824 μs ± 187.560 μs  ┊ GC (mean ± σ):  4.25% ±  3.81%
-```
-
-### Large contingency table
-
-```julia
-X = reshape(repeat(1:16, 625), 100, 100)
-Y = reshape(repeat(1:5, 2000), 100, 100) + X
-m = margins(Y)
-@benchmark ipf(X, m)
-```
-```
- Range (min … max):  1.810 ms …   6.187 ms  ┊ GC (min … max): 0.00% … 52.10%
- Time  (median):     2.388 ms               ┊ GC (median):    0.00%
- Time  (mean ± σ):   2.505 ms ± 634.073 μs  ┊ GC (mean ± σ):  6.53% ± 12.41%
-```
-
-### Six-dimensional contingency table
-
-```julia
-X = reshape(repeat(1:12, 100), 6, 4, 2, 5, 5)
-Y = reshape(repeat(1:5, 240), 6, 4, 2, 5, 5) + X
-m = margins(Y)
-@benchmark ipf(X, m)
-```
-```
-Range (min … max):  212.638 ms … 275.426 ms  ┊ GC (min … max): 1.61% … 1.46%
-Time  (median):     222.012 ms               ┊ GC (median):    1.66%
-Time  (mean ± σ):   228.216 ms ±  17.316 ms  ┊ GC (mean ± σ):  1.76% ± 0.41%
-```
