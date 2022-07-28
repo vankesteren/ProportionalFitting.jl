@@ -35,8 +35,8 @@ Array(fac)
 
 To create the adjusted matrix `Z` with the margins `u` and `v`, we perform elementwise multiplication of this matrix with `X`:
 ```@example ex
-Z = Array(AF) .* X
-``` 41.18     63.0347  17.0337
+Z = Array(fac) .* X
+```
 
 
 We can then check that the marginal sum totals are correct:
