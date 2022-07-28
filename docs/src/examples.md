@@ -2,11 +2,12 @@
 
 ## Regression poststratification
 
-```@example
-# Weight calibration of linear regression estimates
+```@example pstrat
 using StatsKit, FreqTables, ItPropFit
+```
 
-# Generate some data
+First, we generate some fake data with demographic characteristics.
+```@example pstrat
 N = 100
 p_sex = Categorical([0.49, 0.51])
 p_edu = Categorical([0.1, 0.3, 0.4, 0.2])
@@ -19,8 +20,13 @@ df = DataFrame(
     :age => CategoricalArray(["<10", "11<25", "26<50", "51<70", ">70"][rand(p_age, N)], ordered = true),
     :inc => rand(p_inc, N)
 )
-df.opn = df.inc .* .1 + rand(p_opn, N)
+df.opn = 1.5 .+ log.(df.inc) .* .1 + rand(p_opn, N)
 
+df
+```
+
+Then, we create post-stratification weights based on population-level margins using the background characteristics through ItPropFit.
+```@example pstrat
 # Create a cross-table of background characteristics
 tab = freqtable(df, :sex, :edu, :age)
 
@@ -31,14 +37,24 @@ pop_margins = [[0.49, 0.51], [0.05, 0.2, 0.5, 0.25], [0.1, 0.2, 0.4, 0.15, 0.15]
 fac = ipf(Array(tab), pop_margins)
 
 # Compute adjusted table
-# NB: as population margins sum to 1, the table is already normalized!
 tab_adj = Array(fac) .* tab
+```
 
-# Create a poststratification weight variable
+Create weights by looking up the adjusted counts and normalization.
+```@example pstrat
+# Create a poststratification weight variable by lookup from the table
 df.w = [tab_adj[row...] for row in eachrow(df[:, [:sex, :edu, :age]])]
-df.w = df.w ./ sum(df.w) .* N
+df.w = df.w ./ sum(df.w) .* N # normalize the weights
+```
 
+Let's take a look at how our regression estimates change!
+```@example pstrat
+# perform unweighted regression
+frm = @formula(opn ~ log(inc))
+res = lm(frm, df)
+```
+
+```@example pstrat
 # perform weighted regression
-frm = @formula(opn ~ inc)
 res_w = lm(frm, df, wts = df.w)
 ```
