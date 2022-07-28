@@ -3,36 +3,36 @@
 u = [150, 300, 400, 150]
 v = [200, 300, 400, 100]
 @benchmark ipf(X, [u, v])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 1 evaluation.
- Range (min … max):  158.800 μs …   4.290 ms  ┊ GC (min … max): 0.00% … 94.12%
- Time  (median):     162.900 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   170.988 μs ± 157.597 μs  ┊ GC (mean ± σ):  3.64% ±  3.79%
+ Range (min … max):  226.803 μs …   9.894 ms  ┊ GC (min … max): 0.00% … 96.23%
+ Time  (median):     249.203 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   275.342 μs ± 283.948 μs  ┊ GC (mean ± σ):  3.53% ±  3.75%
 
-    ▁▄▇████▇▅▄▃▃▃▂▂▂▂▁▂▁▁       ▁▁▁ ▁▁▁▁                        ▂
-  ▂▅██████████████████████▇██▇████████████▇▇▅▇▆▆▄▄▅▅▅▆▅▇▇▆▇▇▆▇▆ █
-  159 μs        Histogram: log(frequency) by time        191 μs &lt;
+  ▄▆▇█▇▆▅▅▄▃▂▁▁    ▁                                            ▂
+  ████████████████████▇██▇▇▇▇▇▆▅▆▆▅▅▅▅▅▄▅▅▃▃▄▄▁▄▄▃▃▁▃▁▄▃▃▄▃▄▄▃▄ █
+  227 μs        Histogram: log(frequency) by time        584 μs &lt;
 
  Memory estimate: 74.45 KiB, allocs estimate: 1490.</code></pre><h3 id="Large-contingency-table"><a class="docs-heading-anchor" href="#Large-contingency-table">Large contingency table</a><a id="Large-contingency-table-1"></a><a class="docs-heading-anchor-permalink" href="#Large-contingency-table" title="Permalink"></a></h3><pre><code class="language-julia hljs">X = reshape(repeat(1:16, 625), 100, 100)
 Y = reshape(repeat(1:5, 2000), 100, 100) + X
 m = margins(Y)
-@benchmark ipf(X, m)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 2808 samples with 1 evaluation.
- Range (min … max):  1.556 ms …   9.509 ms  ┊ GC (min … max): 0.00% … 36.77%
- Time  (median):     1.624 ms               ┊ GC (median):    0.00%
- Time  (mean ± σ):   1.776 ms ± 431.294 μs  ┊ GC (mean ± σ):  5.76% ± 11.45%
+@benchmark ipf(X, m)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 1358 samples with 1 evaluation.
+ Range (min … max):  3.004 ms …  11.980 ms  ┊ GC (min … max): 0.00% …  0.00%
+ Time  (median):     3.319 ms               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   3.673 ms ± 886.389 μs  ┊ GC (mean ± σ):  5.27% ± 11.19%
 
-  ▅██▅▅▄                   ▁▃               ▁▁▁▁              ▁
-  ███████▅▅▄▁▃▁▄▁▁▁▁▁▁▁▁▁▁▁██▇▇▅▁▁▁▁▁▁▄▇██▇██████▆▆▃▁▁▁▁▁▁▄▅▄ █
-  1.56 ms      Histogram: log(frequency) by time       3.3 ms &lt;
+  ▁▃▅██▇▆▄▄▂▃▃▂                          ▂▂▁                  ▁
+  ██████████████▇█▅▇▆▅▅▅▅▄▅▁▆▅▅▁▆▄▄▆▆▄▇██████▇▆█▄▁▇▅▆▄▅▅▄▄▁▁▅ █
+  3 ms         Histogram: log(frequency) by time      6.55 ms &lt;
 
  Memory estimate: 3.75 MiB, allocs estimate: 13388.</code></pre><h3 id="Six-dimensional-contingency-table"><a class="docs-heading-anchor" href="#Six-dimensional-contingency-table">Six-dimensional contingency table</a><a id="Six-dimensional-contingency-table-1"></a><a class="docs-heading-anchor-permalink" href="#Six-dimensional-contingency-table" title="Permalink"></a></h3><pre><code class="language-julia hljs">X = reshape(repeat(1:12, 100), 6, 4, 2, 5, 5)
 Y = reshape(repeat(1:5, 240), 6, 4, 2, 5, 5) + X
 m = margins(Y)
-@benchmark ipf(X, m)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 24 samples with 1 evaluation.
- Range (min … max):  208.524 ms … 220.648 ms  ┊ GC (min … max): 1.78% … 1.70%
- Time  (median):     209.065 ms               ┊ GC (median):    1.79%
- Time  (mean ± σ):   209.686 ms ±   2.438 ms  ┊ GC (mean ± σ):  1.86% ± 0.35%
+@benchmark ipf(X, m)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 19 samples with 1 evaluation.
+ Range (min … max):  264.795 ms … 298.106 ms  ┊ GC (min … max): 2.07% … 1.84%
+ Time  (median):     269.461 ms               ┊ GC (median):    2.03%
+ Time  (mean ± σ):   272.091 ms ±   7.392 ms  ┊ GC (mean ± σ):  2.01% ± 0.10%
 
-   █▆▄                                                           
-  ▄███▄▄▄▁▁▁▁▁▁▁▁▁▁▁▄▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▄ ▁
-  209 ms           Histogram: frequency by time          221 ms &lt;
+        █                                                        
+  ▅▁▁▁▁▅███▅▅▁▁▅▁▅▁▁▁▁▅▅▁▁▁▁▁▁▁▁▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅ ▁
+  265 ms           Histogram: frequency by time          298 ms &lt;
 
- Memory estimate: 45.82 MiB, allocs estimate: 1527241.</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../examples/">« Examples</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Thursday 28 July 2022 13:31">Thursday 28 July 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ Memory estimate: 45.82 MiB, allocs estimate: 1527241.</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../examples/">« Examples</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Thursday 28 July 2022 14:51">Thursday 28 July 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
