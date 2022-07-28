@@ -35,7 +35,7 @@ fac = ipf(Array(tab), pop_margins)
 tab_adj = Array(fac) .* tab
 
 # Create a poststratification weight variable
-df.w = [tab_adj[Vector{String}(row)...] for row in eachrow(df[:, [:sex, :edu, :age]])]
+df.w = [tab_adj[row...] for row in eachrow(df[:, [:sex, :edu, :age]])]
 df.w = df.w ./ sum(df.w) .* N
 
 # perform weighted regression
