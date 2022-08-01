@@ -95,3 +95,8 @@ function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::I
 
     return ArrayFactors(fac)
 end
+
+function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int = 1000, tol::Float64 = 1e-10)
+    X = ones(length.(mar)...)
+    ipf(X, mar; maxiter = maxiter, tol = tol)
+end
