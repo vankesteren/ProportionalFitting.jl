@@ -30,6 +30,10 @@ struct ArrayFactors{T}
     f::Vector{Vector{T}}
 end
 
+function ArrayFactors(f::Vector...)
+    return ArrayFactors([f...])
+end
+
 # Overloading base methods
 function Base.eltype(::Type{ArrayFactors{T}}) where {T}
     return T
