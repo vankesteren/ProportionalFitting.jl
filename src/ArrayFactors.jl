@@ -27,10 +27,10 @@ julia> Array(AF)
 ```
 """
 struct ArrayFactors{T}
-    f::Vector{Vector{T}}
+    f::Vector{AbstractArray{T}}
 end
 
-function ArrayFactors(f::Vector...)
+function ArrayFactors(f::AbstractArray...)
     return ArrayFactors([f...])
 end
 

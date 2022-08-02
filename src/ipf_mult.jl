@@ -1,12 +1,13 @@
-function ipf_mult(X::AbstractArray{<:Real}, mar::Vector; maxiter::Int = 1000, tol::Float64 = 1e-10)
+function ipf_mult(X::AbstractArray{<:Real}, mar::Vector, dims::Vector; maxiter::Int = 1000, tol::Float64 = 1e-10)
     # dimension check
+    J = length(mar)
     D = sum(ndims.(mar))
     DX = ndims(X)
     if DX != D
         throw(DimensionMismatch("The number of margins ($D) needs to equal ndims(X) = $DX."))
     end
-    D_len = length.(mar)
-    if size(X) != Tuple(D_len)
+    D_size = size.(mar)
+    if size(X) != flatten(D_size...)
         throw(DimensionMismatch("The size of the margins $D_len needs to equal size(X) = $(size(X))."))
     end
 
@@ -20,7 +21,8 @@ function ipf_mult(X::AbstractArray{<:Real}, mar::Vector; maxiter::Int = 1000, to
     end
 
     # initialization (simplified first iteration)
-    fac = [mar[d] ./ vec(sum(X; dims = setdiff(1:D, d))) for d in 1:D]
+    mar_seed = margins(X, dims...)
+    fac = [mar[i] ./ mar_seed[i] for i in 1:J]
     X_prod = copy(X)
 
     # start iteration
@@ -30,23 +32,26 @@ function ipf_mult(X::AbstractArray{<:Real}, mar::Vector; maxiter::Int = 1000, to
         iter += 1
         oldfac = deepcopy(fac)
 
-        for d in 1:D
+        for j in 1:J # loop over margins
             # get complement dimensions
-            notd = setdiff(1:D, d)
-            
+            notj = setdiff(1:J, j)
+            notd = Tuple.(setdiff(dims, [dims[j]]))
+            flat_notd = flatten(notd...)
+
             # multiply by complement factors
-            X_prod = mapslices(x -> x .* fac[notd[1]], X, dims = notd[1])
-            if (D > 2)
-                for nd in notd[2:end]
-                    X_prod = mapslices(x -> x .* fac[nd], X_prod, dims = nd)
+
+            X_prod = mapslices(x -> x .* fac[notj[1]], X, dims = notd[1])
+            if (J > 2)
+                for k in 2:(J-1)
+                    X_prod = mapslices(x -> x .* fac[notj[k]], X_prod, dims = notd[k])
                 end
             end
 
             # then sum over everything but d
-            s = vec(sum(X_prod; dims = notd))
+            s = dropdims(sum(X_prod; dims = flat_notd), dims = flat_notd)
 
             # update this factor
-            fac[d] = mar[d] ./ s
+            fac[j] = mar[j] ./ s
         end
 
         # convergence check

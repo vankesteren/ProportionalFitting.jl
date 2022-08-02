@@ -20,8 +20,7 @@ function margins(X::AbstractArray{<: Real})
     return [vec(sum(X; dims = setdiff(1:D, d))) for d in 1:D]
 end
 
-
-function margins(X::AbstractArray{<: Real}, dims::Vector{Int}...)
+function margins(X::AbstractArray{<: Real}, dims::Union{Int, Vector{Int}}...)
     D = ndims(X)
     m = []
     for d in dims
