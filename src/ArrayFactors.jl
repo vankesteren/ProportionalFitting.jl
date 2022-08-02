@@ -40,7 +40,7 @@ function Base.eltype(::Type{ArrayFactors{T}}) where {T}
 end
 
 function Base.show(io::IO, A::ArrayFactors)
-    print(io, "Factors for array of size $(Tuple(length.(A.f))):")
+    print(io, "Factors for size $(Tuple(length.(A.f))) array:")
     for i in 1:length(A.f)
         print(io, "\n  $i: ")
         show(io, A.f[i])

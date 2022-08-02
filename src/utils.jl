@@ -32,9 +32,10 @@ function margins(X::AbstractArray{<: Real}, dims::Union{Int, Vector{Int}}...)
 end
 
 # flatten nested tuples into single tuple
+# https://discourse.julialang.org/t/efficient-tuple-concatenation/5398/10
 flatten(x::Tuple) = x
 flatten(x::Tuple, y::Tuple) = (x..., y...)
-flatten(x::Tuple, y::Tuple, z::Tuple...) = (x..., tuplejoin(y, z...)...)
+flatten(x::Tuple, y::Tuple, z::Tuple...) = (x..., flatten(y, z...)...)
 
 # margins to dims
 function getdims(m::Vector)
