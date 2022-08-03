@@ -94,7 +94,7 @@ ArrayMargins(X::AbstractArray, DI::Vector) = ArrayMargins(X, DimIndex(DI))
 
 # Base methods
 function Base.show(io::IO, AM::ArrayMargins)
-    print(io, "Margins of $(sum(ndims.(AM.am)))D array:")
+    print(io, "Margins of $(ndims(AM.di))D array:")
     for i in 1:length(AM.am)
         print(io, "\n  $(AM.di.idx[i]): ")
         show(io, AM.am[i])

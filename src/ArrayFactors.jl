@@ -27,11 +27,13 @@ julia> Array(AF)
 ```
 """
 struct ArrayFactors{T}
-    f::Vector{AbstractArray{T}}
+    af::Vector{<:AbstractArray{T}}
+    di::DimIndex
 end
 
-function ArrayFactors(f::AbstractArray...)
-    return ArrayFactors([f...])
+function ArrayFactors(af::AbstractArray...)
+    v = [af...]
+    return ArrayFactors(v, DimIndex(getdims(v)))
 end
 
 # Overloading base methods
@@ -39,16 +41,18 @@ function Base.eltype(::Type{ArrayFactors{T}}) where {T}
     return T
 end
 
-function Base.show(io::IO, A::ArrayFactors)
-    print(io, "Factors for size $(Tuple(length.(A.f))) array:")
-    for i in 1:length(A.f)
-        print(io, "\n  $i: ")
-        show(io, A.f[i])
+function Base.show(io::IO, AF::ArrayFactors)
+    print(io, "Factors for $(ndims(AF.di))D array:")
+    for i in 1:length(AF.af)
+        print(io, "\n  $(AF.di.idx[i]): ")
+        show(io, AF.af[i])
     end
 end
 
+Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[vcat(AF.di.idx...)]
+
 """
-    Array(A::ArrayFactors{T})
+    Array(AF::ArrayFactors{T})
 
 Create an array out of an ArrayFactors object.
 
@@ -76,13 +80,15 @@ julia> Array(fac)
  84  105
 ```
 """
-function Base.Array(A::ArrayFactors{T}) where {T}
-    D = length(A.f)
-    M = ones(T, length.(A.f)...)
-    for idx in CartesianIndices(M)
-        for d in 1:D
-            M[idx] *= A.f[d][idx[d]]
-        end
+function Base.Array(AF::ArrayFactors{T}) where {T}
+    D = length(AF.di)
+    asize = size(AF)
+    M = ones(T, asize)
+    
+    for d in 1:D
+        dims = [AF.di.idx[d]...]
+        shp = ntuple(i -> i ∉ dims ? 1 : asize[pop!(dims)], ndims(AF.di))
+        M .*= reshape(AF.af[d], shp)
     end
     return M
 end
