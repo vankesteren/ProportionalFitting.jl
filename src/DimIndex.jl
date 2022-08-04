@@ -24,7 +24,3 @@ function Base.show(io::IO, DI::DimIndex)
     end
     print("]")
 end
-
-function dims_excluding_idx(DI::DimIndex, i::Int)
-    vcat(setdiff(DI.idx, DI.idx[d])...)
-end

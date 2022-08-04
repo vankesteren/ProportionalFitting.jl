@@ -29,7 +29,28 @@ julia> Array(AF)
 struct ArrayFactors{T}
     af::Vector{<:AbstractArray{T}}
     di::DimIndex
+    function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndex) where T
+        if !issorted(di)
+            idx_new = deepcopy(di.idx)
+            for d in 1:length(di)
+                if issorted(di.idx[d]) continue end
+                order = sortperm(di.idx[d])
+                af[d] = permutedims(af[d], order)
+                idx_new[d] = di.idx[d][order]
+            end
+            # Then, sort the outer vector! do a deepsort
+            order = sortperm(maximum.(idx_new))
+            return new{T}(af[order], DimIndex(idx_new[order]))
+        end
+        
+        return new{T}(af, di)
+    end
 end
+
+
+
+ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndex(getdims(af)))
+    
 
 function ArrayFactors(af::AbstractArray...)
     v = [af...]
@@ -84,10 +105,9 @@ function Base.Array(AF::ArrayFactors{T}) where {T}
     D = length(AF.di)
     asize = size(AF)
     M = ones(T, asize)
-    
     for d in 1:D
         dims = [AF.di.idx[d]...]
-        shp = ntuple(i -> i ∉ dims ? 1 : asize[pop!(dims)], ndims(AF.di))
+        shp = ntuple(i -> i ∉ dims ? 1 : asize[popfirst!(dims)], ndims(AF.di))
         M .*= reshape(AF.af[d], shp)
     end
     return M
