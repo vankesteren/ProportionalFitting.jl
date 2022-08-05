@@ -1,7 +1,7 @@
-struct DimIndex
+struct DimIndices
     idx::Vector{Union{Int, Vector{Int}}}
     # inner constructor checking that all dims are there
-    function DimIndex(idx::Vector{Union{Int, Vector{Int}}})
+    function DimIndices(idx::Vector{Union{Int, Vector{Int}}})
         D = maximum(maximum.(idx))
         dmissing = setdiff(1:D, vcat(idx...))
         length(dmissing) > 0 ? error("Missing array dimensions: $dmissing.") : new(idx)
@@ -9,13 +9,13 @@ struct DimIndex
 end
 
 # convenient constructor
-DimIndex(X::Vector) = DimIndex(Vector{Union{Int, Vector{Int}}}(X))
+DimIndices(X::Vector) = DimIndices(Vector{Union{Int, Vector{Int}}}(X))
 
 # Base methods
-Base.ndims(DI::DimIndex) = maximum(maximum.(DI.idx))
-Base.length(DI::DimIndex) = length(DI.idx)
-Base.issorted(DI::DimIndex) = issorted(vcat(DI.idx...))
-function Base.show(io::IO, DI::DimIndex)
+Base.ndims(DI::DimIndices) = maximum(maximum.(DI.idx))
+Base.length(DI::DimIndices) = length(DI.idx)
+Base.issorted(DI::DimIndices) = issorted(vcat(DI.idx...))
+function Base.show(io::IO, DI::DimIndices)
     println(io, "Indices for $(ndims(DI))D array:")
     print("[")
     for i in 1:length(DI)

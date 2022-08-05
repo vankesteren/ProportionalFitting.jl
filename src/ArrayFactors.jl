@@ -28,8 +28,8 @@ julia> Array(AF)
 """
 struct ArrayFactors{T}
     af::Vector{<:AbstractArray{T}}
-    di::DimIndex
-    function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndex) where T
+    di::DimIndices
+    function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where T
         if !issorted(di)
             idx_new = deepcopy(di.idx)
             for d in 1:length(di)
@@ -40,7 +40,7 @@ struct ArrayFactors{T}
             end
             # Then, sort the outer vector! do a deepsort
             order = sortperm(maximum.(idx_new))
-            return new{T}(af[order], DimIndex(idx_new[order]))
+            return new{T}(af[order], DimIndices(idx_new[order]))
         end
         
         return new{T}(af, di)
@@ -49,12 +49,12 @@ end
 
 
 
-ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndex(getdims(af)))
+ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndices(getdims(af)))
     
 
 function ArrayFactors(af::AbstractArray...)
     v = [af...]
-    return ArrayFactors(v, DimIndex(getdims(v)))
+    return ArrayFactors(v, DimIndices(getdims(v)))
 end
 
 # Overloading base methods

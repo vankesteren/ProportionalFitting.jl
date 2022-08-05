@@ -49,7 +49,7 @@ Margins from 3D array:
 """
 struct ArrayMargins{T}
     am::Vector{AbstractArray{T}}
-    di::DimIndex
+    di::DimIndices
 end
 
 # Constructors based on margins
@@ -61,15 +61,15 @@ function ArrayMargins(am::Vector{<:AbstractArray{T}}) where T
         push!(di, collect((j+1):(j+i)))
         j += i
     end
-    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndex(di))
+    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(di))
 end
 
 function ArrayMargins(am::Vector{<:AbstractArray{T}}, DI::Vector) where T
-    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndex(DI))
+    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(DI))
 end
 
 # Constructors based on arrays
-function ArrayMargins(X::AbstractArray, DI::DimIndex)
+function ArrayMargins(X::AbstractArray, DI::DimIndices)
     D = ndims(X)
     if D != ndims(DI)
         throw(DimensionMismatch("Dimensions of X ($(ndims(X))) mismatch DI ($(ndims(DI)))."))
@@ -89,8 +89,8 @@ function ArrayMargins(X::AbstractArray, DI::DimIndex)
     end
     return ArrayMargins(am, DI)
 end
-ArrayMargins(X::AbstractArray) = ArrayMargins(X, DimIndex([1:ndims(X)...]))
-ArrayMargins(X::AbstractArray, DI::Vector) = ArrayMargins(X, DimIndex(DI))
+ArrayMargins(X::AbstractArray) = ArrayMargins(X, DimIndices([1:ndims(X)...]))
+ArrayMargins(X::AbstractArray, DI::Vector) = ArrayMargins(X, DimIndices(DI))
 
 # Base methods
 function Base.show(io::IO, AM::ArrayMargins)

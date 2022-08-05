@@ -1,7 +1,7 @@
 module ItPropFit
-export ipf, ArrayFactors, ArrayMargins, DimIndex
+export ipf, ArrayFactors, ArrayMargins, DimIndices
 
-include("DimIndex.jl")
+include("DimIndices.jl")
 include("ArrayMargins.jl")
 include("ArrayFactors.jl")
 include("utils.jl")
