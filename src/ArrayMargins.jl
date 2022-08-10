@@ -48,8 +48,24 @@ Margins from 3D array:
 ```
 """
 struct ArrayMargins{T}
-    am::Vector{AbstractArray{T}}
+    am::Vector{<:AbstractArray{T}}
     di::DimIndices
+    function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::DimIndices) where T
+        if !issorted(di)
+            idx_new = deepcopy(di.idx)
+            for d in 1:length(di)
+                if issorted(di.idx[d]) continue end
+                order = sortperm(di.idx[d])
+                am[d] = permutedims(am[d], order)
+                idx_new[d] = di.idx[d][order]
+            end
+            # Then, sort the outer vector! do a deepsort
+            order = sortperm(maximum.(idx_new))
+            return new{T}(am[order], DimIndices(idx_new[order]))
+        end
+        
+        return new{T}(am, di)
+    end
 end
 
 # Constructors based on margins
@@ -76,6 +92,7 @@ function ArrayMargins(X::AbstractArray, DI::DimIndices)
     end
 
     # in case of unsorted dimidx, change the array dimensions
+    # TODO there is an error here
     if !issorted(DI)
         X = permutedims(X, vcat(DI.idx...))
     end
@@ -101,3 +118,5 @@ function Base.show(io::IO, AM::ArrayMargins)
     end
 end
 Base.length(AM::ArrayMargins) = length(AM.am)
+Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))
+Base.size(AM::ArrayMargins) = 

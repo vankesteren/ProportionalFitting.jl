@@ -1,7 +1,7 @@
-function ipf_mult(X::AbstractArray{<:Real}, mar::Vector, dims::Vector; maxiter::Int = 1000, tol::Float64 = 1e-10)
+function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
     # dimension check
     J = length(mar)
-    D = sum(ndims.(mar))
+    D = ndims(mar)
     DX = ndims(X)
     if DX != D
         throw(DimensionMismatch("The number of margins ($D) needs to equal ndims(X) = $DX."))
