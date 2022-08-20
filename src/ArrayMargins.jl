@@ -81,6 +81,9 @@ function ArrayMargins(X::AbstractArray, DI::DimIndices)
     for dim in DI.idx
         notd = Tuple(setdiff(1:D, dim))
         mar = dropdims(sum(X; dims = notd); dims = notd)
+        if !issorted(dim) 
+            mar = permutedims(mar, sortperm(dim))
+        end
         push!(am, mar)
     end
     return ArrayMargins(am, DI)
@@ -96,13 +99,6 @@ function Base.show(io::IO, AM::ArrayMargins)
         show(io, AM.am[i])
     end
 end
-# TODO: compare to Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[vcat(AF.di.idx...)]
-function Base.size(AM::ArrayMargins)
-    dimsizes = Vector{Int}()
-    for m in AM.am
-        dimsizes = vcat(dimsizes, [size(m)...])
-    end
-    return Tuple(dimsizes[vcat(AM.di.idx...)])
-end
+Base.size(AM::ArrayMargins) = flatten(size.(AM.am)...)[sortperm(vcat(AM.di.idx...))]
 Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))

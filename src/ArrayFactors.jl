@@ -67,7 +67,7 @@ function Base.show(io::IO, AF::ArrayFactors)
     end
 end
 
-Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[vcat(AF.di.idx...)]
+Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[sortperm(vcat(AF.di.idx...))]
 
 """
     Array(AF::ArrayFactors{T})
@@ -103,25 +103,16 @@ function Base.Array(AF::ArrayFactors{T}) where {T}
     asize = size(AF)
     M = ones(T, asize)
     for d in 1:D
-        dims = [AF.di.idx[d]...]
+        idx = AF.di.idx[d]
+        af = AF.af[d]
+        if !issorted(idx)
+            sp = sortperm(idx)
+            idx = idx[sp]
+            af = permutedims(af, sp)
+        end
+        dims = [idx...]
         shp = ntuple(i -> i ∉ dims ? 1 : asize[popfirst!(dims)], ndims(AF.di))
-        M .*= reshape(AF.af[d], shp)
+        M .*= reshape(af, shp)
     end
     return M
 end
-
-# TODO: this fails
-# AF = ArrayFactors([[1,2],[3 5 7; 4 6 8]], DimIndices([1,[3,2]]))
-# Array(AF)
-
-# should be the same as
-# AF = ArrayFactors([[1,2],[3 4; 5 6; 7 8]])
-# Array(AF)
-# 2×3×2 Array{Int64, 3}:
-# [:, :, 1] =
-#  3   5   7
-#  6  10  14
-
-# [:, :, 2] =
-#  4   6   8
-#  8  12  16
