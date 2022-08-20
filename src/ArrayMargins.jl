@@ -12,11 +12,11 @@ There are various constructors for ArrayMargins, based on either
 raw margins or an actual array from which the margins are then
 computed.
 
-see also: [`DimIndex`](@ref), [`ArrayFactors`](@ref)
+see also: [`DimIndices`](@ref), [`ArrayFactors`](@ref)
 
 # Fields
 - `am::Vector{AbstractArray}`: Vector of marginal sums.
-- `di::DimIndex`: Dimension indices to which the elements of `am` belong.
+- `di::DimIndices`: Dimension indices to which the elements of `am` belong.
 
 # Examples
 ```julia-repl
@@ -50,25 +50,14 @@ Margins from 3D array:
 struct ArrayMargins{T}
     am::Vector{<:AbstractArray{T}}
     di::DimIndices
-    function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::DimIndices) where T
-        if !issorted(di)
-            idx_new = deepcopy(di.idx)
-            for d in 1:length(di)
-                if issorted(di.idx[d]) continue end
-                order = sortperm(di.idx[d])
-                am[d] = permutedims(am[d], order)
-                idx_new[d] = di.idx[d][order]
-            end
-            # Then, sort the outer vector! do a deepsort
-            order = sortperm(maximum.(idx_new))
-            return new{T}(am[order], DimIndices(idx_new[order]))
-        end
-        
-        return new{T}(am, di)
-    end
 end
 
-# Constructors based on margins
+# Constructor promoting vector to dimindices
+function ArrayMargins(am::Vector{<:AbstractArray{T}}, DI::Vector) where T
+    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(DI))
+end
+
+# Constructor based on margins without indices
 function ArrayMargins(am::Vector{<:AbstractArray{T}}) where T 
     nd = ndims.(am)
     j = 0
@@ -80,23 +69,13 @@ function ArrayMargins(am::Vector{<:AbstractArray{T}}) where T
     ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(di))
 end
 
-function ArrayMargins(am::Vector{<:AbstractArray{T}}, DI::Vector) where T
-    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(DI))
-end
-
-# Constructors based on arrays
+# Constructor based on array
 function ArrayMargins(X::AbstractArray, DI::DimIndices)
     D = ndims(X)
     if D != ndims(DI)
         throw(DimensionMismatch("Dimensions of X ($(ndims(X))) mismatch DI ($(ndims(DI)))."))
     end
 
-    # in case of unsorted dimidx, change the array dimensions
-    # TODO there is an error here
-    if !issorted(DI)
-        X = permutedims(X, vcat(DI.idx...))
-    end
-    
     # create the margins
     am = Vector{AbstractArray{eltype(X)}}()
     for dim in DI.idx
@@ -117,6 +96,12 @@ function Base.show(io::IO, AM::ArrayMargins)
         show(io, AM.am[i])
     end
 end
+function Base.size(AM::ArrayMargins)
+    dimsizes = Vector{Int}()
+    for m in AM.am
+        dimsizes = vcat(sizes, [size(m)...])
+    end
+    return Tuple(dimsizes[vcat(AM.di.idx...)])
+end
 Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))
-Base.size(AM::ArrayMargins) = 
