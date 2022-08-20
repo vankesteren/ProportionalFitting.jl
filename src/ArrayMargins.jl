@@ -96,10 +96,11 @@ function Base.show(io::IO, AM::ArrayMargins)
         show(io, AM.am[i])
     end
 end
+# TODO: compare to Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[vcat(AF.di.idx...)]
 function Base.size(AM::ArrayMargins)
     dimsizes = Vector{Int}()
     for m in AM.am
-        dimsizes = vcat(sizes, [size(m)...])
+        dimsizes = vcat(dimsizes, [size(m)...])
     end
     return Tuple(dimsizes[vcat(AM.di.idx...)])
 end

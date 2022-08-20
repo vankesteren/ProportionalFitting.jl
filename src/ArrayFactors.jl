@@ -4,7 +4,7 @@
 Array factors are defined such that the array's elements are their products:
 `M[i, j, ..., l] = f[1][i] * f[2][j] * ... * f[3][l]`
 
-see also: [`ipf`](@ref), [`margins`](@ref), [`Array`](@ref)
+see also: [`ipf`](@ref), [`ArrayMargins`](@ref), [`DimIndices`](@ref)
 
 # Fields
 - `f::Vector{Vector{T}}`: Vector of array factors
@@ -29,28 +29,25 @@ julia> Array(AF)
 struct ArrayFactors{T}
     af::Vector{<:AbstractArray{T}}
     di::DimIndices
-    function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where T
-        if !issorted(di)
-            idx_new = deepcopy(di.idx)
-            for d in 1:length(di)
-                if issorted(di.idx[d]) continue end
-                order = sortperm(di.idx[d])
-                af[d] = permutedims(af[d], order)
-                idx_new[d] = di.idx[d][order]
-            end
-            # Then, sort the outer vector! do a deepsort
-            order = sortperm(maximum.(idx_new))
-            return new{T}(af[order], DimIndices(idx_new[order]))
-        end
+    # function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where T
+    #     if !issorted(di)
+    #         idx_new = deepcopy(di.idx)
+    #         for d in 1:length(di)
+    #             if issorted(di.idx[d]) continue end
+    #             order = sortperm(di.idx[d])
+    #             af[d] = permutedims(af[d], order)
+    #             idx_new[d] = di.idx[d][order]
+    #         end
+    #         # Then, sort the outer vector! do a deepsort
+    #         order = sortperm(maximum.(idx_new))
+    #         return new{T}(af[order], DimIndices(idx_new[order]))
+    #     end
         
-        return new{T}(af, di)
-    end
+    #     return new{T}(af, di)
+    # end
 end
 
-
-
 ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndices(getdims(af)))
-    
 
 function ArrayFactors(af::AbstractArray...)
     v = [af...]
@@ -112,3 +109,19 @@ function Base.Array(AF::ArrayFactors{T}) where {T}
     end
     return M
 end
+
+# TODO: this fails
+# AF = ArrayFactors([[1,2],[3 5 7; 4 6 8]], DimIndices([1,[3,2]]))
+# Array(AF)
+
+# should be the same as
+# AF = ArrayFactors([[1,2],[3 4; 5 6; 7 8]])
+# Array(AF)
+# 2×3×2 Array{Int64, 3}:
+# [:, :, 1] =
+#  3   5   7
+#  6  10  14
+
+# [:, :, 2] =
+#  4   6   8
+#  8  12  16
