@@ -29,26 +29,12 @@ julia> Array(AF)
 struct ArrayFactors{T}
     af::Vector{<:AbstractArray{T}}
     di::DimIndices
-    # function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where T
-    #     if !issorted(di)
-    #         idx_new = deepcopy(di.idx)
-    #         for d in 1:length(di)
-    #             if issorted(di.idx[d]) continue end
-    #             order = sortperm(di.idx[d])
-    #             af[d] = permutedims(af[d], order)
-    #             idx_new[d] = di.idx[d][order]
-    #         end
-    #         # Then, sort the outer vector! do a deepsort
-    #         order = sortperm(maximum.(idx_new))
-    #         return new{T}(af[order], DimIndices(idx_new[order]))
-    #     end
-        
-    #     return new{T}(af, di)
-    # end
 end
 
+# promoting constructor
 ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndices(getdims(af)))
 
+# constructor based on arrays vararg
 function ArrayFactors(af::AbstractArray...)
     v = [af...]
     return ArrayFactors(v, DimIndices(getdims(v)))

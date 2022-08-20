@@ -1,3 +1,4 @@
+# TODO: work with arraymargins and dimindices
 function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
     # dimension check
     J = length(mar)
