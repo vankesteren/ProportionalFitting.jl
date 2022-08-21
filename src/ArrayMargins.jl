@@ -32,18 +32,18 @@ julia> X = reshape(1:12, 2, 3, 2)
 
 julia> ArrayMargins(X)
 Margins from 3D array:
-  1: [36, 42]
-  2: [18, 26, 34]
-  3: [21, 57]
+  [1]: [36, 42]
+  [2]: [18, 26, 34]
+  [3]: [21, 57]
 
 julia> ArrayMargins(X, [1, [2, 3]])
 Margins from 3D array:
-  1: [36, 42]
+  [1]: [36, 42]
   [2, 3]: [3 15; 7 19; 11 23]
 
 julia> ArrayMargins(X, [1, [3, 2]])
 Margins from 3D array:
-  1: [36, 42]
+  [1]: [36, 42]
   [3, 2]: [3 7 11; 15 19 23]
 ```
 """

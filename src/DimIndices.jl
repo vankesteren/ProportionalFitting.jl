@@ -1,27 +1,27 @@
 """
-    DimIndices(idx::Vector{Union{Int, Vector{Int}}})
+    DimIndices(idx::Vector{Vector{Int}})
 
 DimIndices represent an exhaustive list of indices for the 
 dimensions of an array. It is an object containing a single
-element, `idx`, which is a (possibly nested) vector of integers; 
-e.g., `[2, [1, 3], 4]`. DimIndices objects are checked for 
+element, `idx`, which is a nested vector of integers; 
+e.g., `[[2], [1, 3], [4]]`. DimIndices objects are checked for 
 uniqueness and completeness, i.e., all indices up to the largest
 index are used exactly once.
 
 # Fields
-- `idx::Vector{Union{Int, Vector{Int}}}`: (possibly nested) vector of dimension indices.
+- `idx::Vector{Vector{Int}}`: nested vector of dimension indices.
 
 # Examples
 ```julia-repl
 julia> DimIndices([2, [1, 3], 4])
 Indices for 4D array:
-[2, [1, 3], 4]
+[[2], [1, 3], [4]]
 ```
 """
 struct DimIndices
-    idx::Vector{Union{Int, Vector{Int}}}
+    idx::Vector{Vector{Int}}
     # inner constructor checking uniqueness & completeness
-    function DimIndices(idx::Vector{Union{Int, Vector{Int}}})
+    function DimIndices(idx::Vector{Vector{Int}})
         # uniqueness
         if !allunique(vcat(idx...)) 
             error("Some dimensions were duplicated.")
@@ -38,6 +38,9 @@ end
 
 # convenient constructor
 DimIndices(X::Vector) = DimIndices(Vector{Union{Int, Vector{Int}}}(X))
+function DimIndices(X::Vector{Union{Int, Vector{Int}}})
+    DimIndices(broadcast((x) -> [x...], X))
+end
 
 # Base methods
 Base.ndims(DI::DimIndices) = maximum(maximum.(DI.idx))
