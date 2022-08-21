@@ -34,6 +34,8 @@ end
 # promoting constructor
 ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndices(getdims(af)))
 
+# todo: constructor for mixed-type arrayfactors ([[1, 2, 3], [.4, .5]])
+
 # constructor based on arrays vararg
 function ArrayFactors(af::AbstractArray...)
     v = [af...]
