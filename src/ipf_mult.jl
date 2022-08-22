@@ -4,8 +4,9 @@ function ipf_mult(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 10
     if ndims(X) != ndims(mar)
         throw(DimensionMismatch("The number of margins ($(ndims(mar))) needs to equal ndims(X) = $(ndims(X))."))
     end
-    if size(X) != size(mar)
-        throw(DimensionMismatch("The size of the margins $(size(mar)) needs to equal size(X) = $(size(X))."))
+    array_size = size(X)
+    if array_size != size(mar)
+        throw(DimensionMismatch("The size of the margins $(size(mar)) needs to equal size(X) = $array_size."))
     end
 
     # margin consistency check
@@ -35,19 +36,36 @@ function ipf_mult(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 10
             # get complement dimensions
             notj = setdiff(1:J, j)
             notd = dropdims(di; dims = j)
-            flat_notd = Tuple(vcat(notd...))
 
             # multiply by complement factors
             # todo: something wrong with sorting for multidim arrays here
             # look at Array(ArrayFactors) for solution :)
-            X_prod = mapslices(x -> x .* fac[notj[1]], X, dims = notd[1])
-            if (J > 2)
-                for k in 2:(J-1)
-                    X_prod = mapslices(x -> x .* fac[notj[k]], X_prod, dims = notd[k])
+            for k in 1:(J-1)
+                cur_idx = di[notj[k]]
+                cur_fac = fac[notj[k]]
+                if !issorted(cur_idx)
+                    sp = sortperm(cur_idx)
+                    cur_idx = cur_idx[sp]
+                    cur_fac = permutedims(cur_fac, sp)
+                end
+                dims = [cur_idx...]
+                shp = ntuple(i -> i ∉ dims ? 1 : array_size[popfirst!(dims)], ndims(di))
+                if k == 1 
+                    X_prod = X .* reshape(cur_fac, shp)
+                else
+                    X_prod .*= reshape(cur_fac, shp)
                 end
             end
 
+            # X_prod = mapslices(x -> x .* fac[notj[1]], X, dims = notd[1])
+            # if (J > 2)
+            #     for k in 2:(J-1)
+            #         X_prod = mapslices(x -> x .* fac[notj[k]], X_prod, dims = notd[k])
+            #     end
+            # end
+
             # then sum over everything but d
+            flat_notd = Tuple(vcat(notd...))
             s = dropdims(sum(X_prod; dims = flat_notd), dims = flat_notd)
 
             # update this factor
