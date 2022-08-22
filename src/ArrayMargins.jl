@@ -82,7 +82,7 @@ function ArrayMargins(X::AbstractArray, DI::DimIndices)
         notd = Tuple(setdiff(1:D, dim))
         mar = dropdims(sum(X; dims = notd); dims = notd)
         if !issorted(dim) 
-            mar = permutedims(mar, sortperm(dim))
+            mar = permutedims(mar, sortperm(sortperm(dim)))
         end
         push!(am, mar)
     end
