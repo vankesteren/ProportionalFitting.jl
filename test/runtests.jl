@@ -63,7 +63,7 @@ end
     fac4 = ArrayFactors([f1, f2, f3, f4], di)
     @test length(Array(fac4)) == prod(size(fac4))
 
-    di = DimIndices([1, [3, 2], 4, [5, 6, 7]]])
+    di = DimIndices([1, [3, 2], 4, [5, 6, 7]])
     fac5 = ArrayFactors([f1, f2', f3, f4], di)
     @test Array(fac4) ≈ Array(fac5) # nb: approx because floating point errors
 
@@ -94,18 +94,32 @@ end
 #     @test margins(Array(AF) .* X) ≈ m
 # end
 
-# @testset "Multidimensional ipf" begin
-#     # Small three-dimensional case
-#     X = reshape(1:12, 2, 3, 2)
-#     m = [[48, 60], [28, 36, 44], [34, 74]]
-#     AF = ipf(X, m)
-#     @test margins(Array(AF) .* X) ≈ m
+@testset "Multidimensional ipf" begin
+    # Small three-dimensional case
+    X = reshape(1:12, 2, 3, 2)
+    m = ArrayMargins([[48, 60], [28, 36, 44], [34, 74]])
+    AF = ipf_mult(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime)
+    @test AM.am ≈ m.am
 
-#     # large six-dimensional case
-#     X = reshape(repeat(1:12, 100), 6, 4, 2, 5, 5)
-#     Y = reshape(repeat(1:5, 240), 6, 4, 2, 5, 5) + X
-#     m = margins(Y)
-#     AF = ipf(X, m)
-#     @test margins(Array(AF) .* X) ≈ m
-# end
+    # large five-dimensional case
+    X = reshape(repeat(1:12, 100), 6, 4, 2, 5, 5)
+    Y = reshape(repeat(1:5, 240), 6, 4, 2, 5, 5) + X
+    m = ArrayMargins(Y)
+    AF = ipf_mult(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime)
+    @test AM.am ≈ m.am
+
+    # large five-dimensional case with multidimensional margins
+    di = DimIndices([[1, 2], [3, 4, 5]])
+    m = ArrayMargins(Y, di)
+    AF = ipf_mult(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime, di)
+    @test AM.am ≈ m.am
+
+    # TODO: large five-dimensional case with unordered multidimensional margins!!
+end
 

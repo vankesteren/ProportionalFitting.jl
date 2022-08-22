@@ -46,6 +46,7 @@ end
 Base.ndims(DI::DimIndices) = maximum(maximum.(DI.idx))
 Base.length(DI::DimIndices) = length(DI.idx)
 Base.issorted(DI::DimIndices) = issorted(vcat(maximum.(DI.idx)...))
+Base.getindex(DI::DimIndices, varargs...) = getindex(DI.idx, varargs...)
 function Base.show(io::IO, DI::DimIndices)
     println(io, "Indices for $(ndims(DI))D array:")
     print("[")
@@ -54,4 +55,14 @@ function Base.show(io::IO, DI::DimIndices)
         if i != length(DI) print(", ") end
     end
     print("]")
+end
+
+# Convenience methods
+function Base.dropdims(DI::DimIndices; dims::Union{Int, Vector{Int}})
+    idx = setdiff(1:length(DI), dims)
+    return DI[idx]
+end
+
+function Base.selectdim(DI::DimIndices, d::Union{Int, Vector{Int}})
+    return vcat(DI[d]...)
 end

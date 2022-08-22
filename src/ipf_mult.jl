@@ -1,19 +1,15 @@
 # TODO: work with arraymargins and dimindices
-function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
+function ipf_mult(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
     # dimension check
-    J = length(mar)
-    D = ndims(mar)
-    DX = ndims(X)
-    if DX != D
-        throw(DimensionMismatch("The number of margins ($D) needs to equal ndims(X) = $DX."))
+    if ndims(X) != ndims(mar)
+        throw(DimensionMismatch("The number of margins ($(ndims(mar))) needs to equal ndims(X) = $(ndims(X))."))
     end
-    D_size = size.(mar)
-    if size(X) != flatten(D_size...)
-        throw(DimensionMismatch("The size of the margins $D_len needs to equal size(X) = $(size(X))."))
+    if size(X) != size(mar)
+        throw(DimensionMismatch("The size of the margins $(size(mar)) needs to equal size(X) = $(size(X))."))
     end
 
     # margin consistency check
-    marsums = sum.(mar)
+    marsums = sum.(mar.am)
     if (maximum(marsums) - minimum(marsums)) > tol
         # transform to proportions
         @info "Inconsistent target margins, converting `X` and `mar` to proportions. Margin totals: $marsums" 
@@ -22,10 +18,12 @@ function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 100
     end
 
     # initialization (simplified first iteration)
-    mar_seed = margins(X, dims...)
-    fac = [mar[i] ./ mar_seed[i] for i in 1:J]
+    J = length(mar)
+    di = mar.di
+    mar_seed = ArrayMargins(X, di)
+    fac = [mar.am[i] ./ mar_seed.am[i] for i in 1:J]
     X_prod = copy(X)
-
+    
     # start iteration
     iter = 0
     crit = 0.
@@ -36,11 +34,12 @@ function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 100
         for j in 1:J # loop over margins
             # get complement dimensions
             notj = setdiff(1:J, j)
-            notd = Tuple.(setdiff(dims, [dims[j]]))
-            flat_notd = flatten(notd...)
+            notd = dropdims(di; dims = j)
+            flat_notd = Tuple(vcat(notd...))
 
             # multiply by complement factors
-
+            # todo: something wrong with sorting for multidim arrays here
+            # look at Array(ArrayFactors) for solution :)
             X_prod = mapslices(x -> x .* fac[notj[1]], X, dims = notd[1])
             if (J > 2)
                 for k in 2:(J-1)
@@ -52,7 +51,7 @@ function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 100
             s = dropdims(sum(X_prod; dims = flat_notd), dims = flat_notd)
 
             # update this factor
-            fac[j] = mar[j] ./ s
+            fac[j] = mar.am[j] ./ s
         end
 
         # convergence check
@@ -66,5 +65,5 @@ function ipf_mult(X::AbstractArray{<:Real}, AM::ArrayMargins; maxiter::Int = 100
         @info "Converged in $iter iterations."
     end
 
-    return ArrayFactors(fac)
+    return ArrayFactors(fac, di)
 end
