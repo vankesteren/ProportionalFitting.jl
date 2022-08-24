@@ -69,6 +69,10 @@ function ipf_mult(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 10
             s = dropdims(sum(X_prod; dims = flat_notd), dims = flat_notd)
 
             # update this factor
+            if !issorted(di[j])
+                sp = sortperm(sortperm(di[j]))
+                s = permutedims(s, sp)
+            end
             fac[j] = mar.am[j] ./ s
         end
 

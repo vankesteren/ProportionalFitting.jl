@@ -121,5 +121,11 @@ end
     @test AM.am ≈ m.am
 
     # TODO: large five-dimensional case with unordered multidimensional margins!!
+    di = DimIndices([[1, 4], [5, 2, 3]])
+    m = ArrayMargins(Y, di)
+    AF = ipf_mult(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime, di)
+    @test AM.am ≈ m.am
 end
 
