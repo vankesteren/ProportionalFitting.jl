@@ -56,8 +56,12 @@ end
 # promoting constructor
 ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndices(getdims(af)))
 
-# TODO: constructor for mixed-type arrayfactors ([[1, 2, 3], [.4, .5]])
-# needs promotion before construction
+# Constructor for mixed-type arrayfactors needs promotion before construction
+function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices) 
+    AT = eltype(af)
+    PT = promote_type(eltype.(af)...)
+    ArrayFactors(Vector{AT{PT}}(af), di)
+end
 
 # constructor based on arrays vararg
 function ArrayFactors(af::AbstractArray...)
