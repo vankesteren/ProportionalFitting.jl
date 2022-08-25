@@ -44,7 +44,7 @@ function ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, t
     # margin consistency check
     if !isconsistent(mar; tol = tol)
         # transform to proportions
-        @info "Inconsistent target margins, converting `X` and `mar` to proportions. Margin totals: $marsums" 
+        @info "Inconsistent target margins, converting `X` and `mar` to proportions. Margin totals: $(sum.(mar.am))" 
         X /= sum(X)
         mar = proportion_transform(mar)
     end
@@ -125,4 +125,8 @@ end
 
 function ipf(mar::ArrayMargins{T}; maxiter::Int = 1000, tol::Float64 = 1e-10) where T
     ipf(ones(T, size(mar)), mar; maxiter = maxiter, tol = tol)
+end
+
+function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int = 1000, tol::Float64 = 1e-10)
+    ipf(ArrayMargins(mar); maxiter = maxiter, tol = tol)
 end

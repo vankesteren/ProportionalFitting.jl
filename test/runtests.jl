@@ -21,6 +21,12 @@ end
     @test typeof(mar) == ArrayMargins{Int}
     @test length(mar) == 2
     @test size(mar) == (3, 4)
+    
+    # Consistency check
+    @test isconsistent(mar)
+    
+    mar_p = proportion_transform(mar)
+    @test sum.(mar_p.am) == [1., 1.]
 
     # Constructors
     mar2 = ArrayMargins([[22, 26, 30], [6, 15, 24, 33]])
@@ -77,15 +83,26 @@ end
 end
 
 @testset "Two-dimensional ipf" begin
-    # Basic example
+    # Basic example with convenient interface
     X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
     u = [150, 300, 400, 150]
     v = [200, 300, 400, 100]
 
-    AF = ipf(X, [u, v]) # convenience constructor
+    AF = ipf(X, [u, v])
     X_prime = Array(AF) .* X
     AM = ArrayMargins(X_prime)
     @test AM.am ≈ [u, v]
+
+    # Margins only
+    AF = ipf([u, v])
+    AM = ArrayMargins(Array(AF))
+    @test AM.am ≈ [u, v]
+
+    # Inconsistent margins
+    w = [15, 30, 40, 15]
+    AF = ipf(X, [w, v]) 
+    AM = ArrayMargins(X ./ sum(X) .* Array(AF))
+    @test AM.am ≈ [w ./ sum(w), v ./ sum(v)]
 
     # Large 100 x 100 matrix
     X = reshape(repeat(1:16, 625), 100, 100)
@@ -94,7 +111,7 @@ end
     AF = ipf(X, m)
     X_prime = Array(AF) .* X
     AM = ArrayMargins(X_prime)
-    @test AM.am ≈ m.am
+    @test AM.am ≈ m.am    
 end
 
 @testset "Multidimensional ipf" begin
