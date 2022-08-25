@@ -56,6 +56,7 @@ function Base.show(io::IO, AF::ArrayFactors)
 end
 
 Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[sortperm(vcat(AF.di.idx...))]
+Base.length(AF::ArrayFactors) = length(AF.af)
 
 """
     Array(AF::ArrayFactors{T})
