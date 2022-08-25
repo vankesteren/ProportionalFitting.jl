@@ -56,13 +56,3 @@ function Base.show(io::IO, DI::DimIndices)
     end
     print("]")
 end
-
-# Convenience methods
-function Base.dropdims(DI::DimIndices; dims::Union{Int, Vector{Int}})
-    idx = setdiff(1:length(DI), dims)
-    return DI[idx]
-end
-
-function Base.selectdim(DI::DimIndices, d::Union{Int, Vector{Int}})
-    return vcat(DI[d]...)
-end
