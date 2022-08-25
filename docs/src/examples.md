@@ -31,7 +31,7 @@ Then, we create post-stratification weights based on population-level margins us
 tab = freqtable(df, :sex, :edu, :age)
 
 # Create margins from the population (aggregates obtained from statistical agency)
-pop_margins = [[0.49, 0.51], [0.05, 0.2, 0.5, 0.25], [0.1, 0.2, 0.4, 0.15, 0.15]]
+pop_margins = ArrayMargins([[0.49, 0.51], [0.05, 0.2, 0.5, 0.25], [0.1, 0.2, 0.4, 0.15, 0.15]])
 
 # Compute array factors
 fac = ipf(Array(tab), pop_margins)
@@ -40,7 +40,7 @@ fac = ipf(Array(tab), pop_margins)
 tab_adj = Array(fac) .* tab
 ```
 
-Create weights by looking up the adjusted counts and normalization.
+Create weights by looking up the adjusted counts and then performing normalization.
 ```@example pstrat
 # Create a poststratification weight variable by lookup from the table
 df.w = [tab_adj[row...] for row in eachrow(df[:, [:sex, :edu, :age]])]

@@ -1,8 +1,9 @@
 """
     ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndex)
+    ArrayMargins(am::Vector{<:AbstractArray{T}}, di::Vector)
     ArrayMargins(am::Vector{<:AbstractArray})
-    ArrayMargins(X::AbstractArray)
     ArrayMargins(X::AbstractArray, di::DimIndex)
+    ArrayMargins(X::AbstractArray)
 
 ArrayMargins are marginal sums of an array, combined with the 
 indices of the dimensions these sums belong to. The marginal
@@ -12,7 +13,7 @@ There are various constructors for ArrayMargins, based on either
 raw margins or an actual array from which the margins are then
 computed.
 
-see also: [`DimIndices`](@ref), [`ArrayFactors`](@ref)
+see also: [`DimIndices`](@ref), [`ArrayFactors`](@ref), [`ipf`](@ref)
 
 # Fields
 - `am::Vector{AbstractArray}`: Vector of marginal sums.
@@ -41,10 +42,10 @@ Margins from 3D array:
   [1]: [36, 42]
   [2, 3]: [3 15; 7 19; 11 23]
 
-julia> ArrayMargins(X, [1, [3, 2]])
-Margins from 3D array:
-  [1]: [36, 42]
-  [3, 2]: [3 7 11; 15 19 23]
+julia> ArrayMargins(X, [2, [3, 1]])
+Margins of 3D array:
+  [2]: [18, 26, 34]
+  [3, 1]: [9 12; 27 30]
 ```
 """
 struct ArrayMargins{T}
@@ -53,8 +54,8 @@ struct ArrayMargins{T}
 end
 
 # Constructor promoting vector to dimindices
-function ArrayMargins(am::Vector{<:AbstractArray{T}}, DI::Vector) where T
-    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(DI))
+function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::Vector) where T
+    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(di))
 end
 
 # Constructor based on margins without indices
@@ -70,15 +71,15 @@ function ArrayMargins(am::Vector{<:AbstractArray{T}}) where T
 end
 
 # Constructor based on array
-function ArrayMargins(X::AbstractArray, DI::DimIndices)
+function ArrayMargins(X::AbstractArray, di::DimIndices)
     D = ndims(X)
-    if D != ndims(DI)
-        throw(DimensionMismatch("Dimensions of X ($(ndims(X))) mismatch DI ($(ndims(DI)))."))
+    if D != ndims(di)
+        throw(DimensionMismatch("Dimensions of X ($(ndims(X))) mismatch DI ($(ndims(di)))."))
     end
 
     # create the margins
     am = Vector{AbstractArray{eltype(X)}}()
-    for dim in DI.idx
+    for dim in di.idx
         notd = Tuple(setdiff(1:D, dim))
         mar = dropdims(sum(X; dims = notd); dims = notd)
         if !issorted(dim) 
@@ -86,7 +87,7 @@ function ArrayMargins(X::AbstractArray, DI::DimIndices)
         end
         push!(am, mar)
     end
-    return ArrayMargins(am, DI)
+    return ArrayMargins(am, di)
 end
 ArrayMargins(X::AbstractArray) = ArrayMargins(X, DimIndices([1:ndims(X)...]))
 ArrayMargins(X::AbstractArray, DI::Vector) = ArrayMargins(X, DimIndices(DI))
