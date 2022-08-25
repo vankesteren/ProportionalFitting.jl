@@ -1,15 +1,15 @@
 """
-    ipf(X, mar[; maxiter, tol])
+    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
 
 Perform iterative proportional fitting (factor method). The array (X) can be
-any number of dimensions, as long as the margins have the correct size.
+any number of dimensions, and the margins can be 
 Will return the weights as an ArrayFactors object. 
 
-see also: [`ArrayFactors`](@ref), [`margins`](@ref)
+see also: [`ArrayFactors`](@ref), [`ArrayMargins`](@ref)
 
 # Arguments
 - `X::AbstractArray{<:Real}`: Array to be adjusted
-- `mar::Vector{<:Vector{<:Real}}`: Target margins
+- `mar::ArrayMargins`: Target margins as an ArrayMargins object
 - `maxiter::Int=1000`: Maximum number of iterations
 - `tol::Float64=1e-10`: Factor change tolerance for convergence
 
@@ -31,31 +31,31 @@ julia> Array(AF) .* X
  28.7516   41.18     63.0347  17.0337
 ```
 """
-function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::Int = 1000, tol::Float64 = 1e-10)
+function ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
     # dimension check
-    D = length(mar)
-    DX = ndims(X)
-    if DX != D
-        throw(DimensionMismatch("The number of margins ($D) needs to equal ndims(X) = $(ndims(X))."))
+    if ndims(X) != ndims(mar)
+        throw(DimensionMismatch("The number of margins ($(ndims(mar))) needs to equal ndims(X) = $(ndims(X))."))
     end
-    D_len = length.(mar)
-    if size(X) != Tuple(D_len)
-        throw(DimensionMismatch("The size of the margins $D_len needs to equal size(X) = $(size(X))."))
+    array_size = size(X)
+    if array_size != size(mar)
+        throw(DimensionMismatch("The size of the margins $(size(mar)) needs to equal size(X) = $array_size."))
     end
 
     # margin consistency check
-    marsums = sum.(mar)
-    if (maximum(marsums) - minimum(marsums)) > tol
+    if !isconsistent(mar; tol = tol)
         # transform to proportions
         @info "Inconsistent target margins, converting `X` and `mar` to proportions. Margin totals: $marsums" 
         X /= sum(X)
-        mar = convert.(Vector{Float64}, mar) ./ marsums
+        mar = proportion_transform(mar)
     end
 
     # initialization (simplified first iteration)
-    fac = [mar[d] ./ vec(sum(X; dims = setdiff(1:D, d))) for d in 1:D]
+    J = length(mar)
+    di = mar.di
+    mar_seed = ArrayMargins(X, di)
+    fac = [mar.am[i] ./ mar_seed.am[i] for i in 1:J]
     X_prod = copy(X)
-
+    
     # start iteration
     iter = 0
     crit = 0.
@@ -63,23 +63,46 @@ function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::I
         iter += 1
         oldfac = deepcopy(fac)
 
-        for d in 1:D
+        for j in 1:J # loop over margin elements
             # get complement dimensions
-            notd = setdiff(1:D, d)
-            
-            # multiply by complement factors
-            X_prod = mapslices(x -> x .* fac[notd[1]], X, dims = notd[1])
-            if (D > 2)
-                for nd in notd[2:end]
-                    X_prod = mapslices(x -> x .* fac[nd], X_prod, dims = nd)
+            notj = setdiff(1:J, j)
+            notd = di[notj]
+
+            # create X multiplied by complement factors
+            for k in 1:(J-1) # loop over complement dimensions
+                # get current dimindex & current factor
+                cur_idx = di[notj[k]]
+                cur_fac = fac[notj[k]]
+
+                # reorder if necessary for elementwise multiplication
+                if !issorted(cur_idx)
+                    sp = sortperm(cur_idx)
+                    cur_idx = cur_idx[sp]
+                    cur_fac = permutedims(cur_fac, sp)
+                end
+
+                # create correct shape for elementwise multiplication
+                dims = copy(cur_idx)
+                shp = ntuple(i -> i ∉ dims ? 1 : array_size[popfirst!(dims)], ndims(di))
+
+                # perform elementwise multiplication
+                if k == 1 
+                    X_prod = X .* reshape(cur_fac, shp)
+                else
+                    X_prod .*= reshape(cur_fac, shp)
                 end
             end
 
-            # then sum over everything but d
-            s = vec(sum(X_prod; dims = notd))
+            # then we compute the margin by summing over all complement dimensions
+            complement_dims = Tuple(vcat(notd...))
+            cur_sum = dropdims(sum(X_prod; dims = complement_dims), dims = complement_dims)
+            if !issorted(di[j])
+                # reorder if necessary for elementwise division
+                cur_sum = permutedims(cur_sum, sortperm(sortperm(di[j])))
+            end
 
             # update this factor
-            fac[d] = mar[d] ./ s
+            fac[j] = mar.am[j] ./ cur_sum
         end
 
         # convergence check
@@ -93,10 +116,13 @@ function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::I
         @info "Converged in $iter iterations."
     end
 
-    return ArrayFactors(fac)
+    return ArrayFactors(fac, di)
 end
 
-function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int = 1000, tol::Float64 = 1e-10)
-    X = ones(length.(mar)...)
-    ipf(X, mar; maxiter = maxiter, tol = tol)
+function ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}}; maxiter::Int = 1000, tol::Float64 = 1e-10)
+    ipf(X, ArrayMargins(mar); maxiter = maxiter, tol = tol)
+end
+
+function ipf(mar::ArrayMargins{T}; maxiter::Int = 1000, tol::Float64 = 1e-10) where T
+    ipf(ones(T, size(mar)), mar; maxiter = maxiter, tol = tol)
 end

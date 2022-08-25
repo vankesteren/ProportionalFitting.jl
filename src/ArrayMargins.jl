@@ -102,3 +102,14 @@ end
 Base.size(AM::ArrayMargins) = flatten(size.(AM.am)...)[sortperm(vcat(AM.di.idx...))]
 Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))
+
+# methods for consistency of margins
+function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
+    marsums = sum.(AM.am)
+    return (maximum(marsums) - minimum(marsums)) < tol
+end
+
+function proportion_transform(AM::ArrayMargins)
+    mar = convert.(Vector{Float64}, AM.am) ./ sum.(AM.am)
+    return ArrayMargins(mar, AM.di)
+end
