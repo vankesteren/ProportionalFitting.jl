@@ -45,6 +45,19 @@ We can then check that the marginal sum totals are correct:
 ArrayMargins(Z)
 ```
 
+## Inconsistent margins
+If the margins are inconsistent (i.e., the margins do not sum to the same amounts) then both `X` and the margins will be transformed to proportions.
+```@example ex
+m = ArrayMargins([[12, 23, 14, 35], [17, 44, 12, 33]])
+af = ipf(X, m)
+```
+
+Then, `Z` needs to be computed in a different way as well:
+```@example ex
+X_prop = X ./ sum(X)
+Z = X_prop .* Array(af)
+```
+
 ## Multidimensional arrays
 
 ItPropFit can also deal with multidimensional arrays of arbitrary shape. For example, consider the following `(3, 2, 3)` array and target margins:
