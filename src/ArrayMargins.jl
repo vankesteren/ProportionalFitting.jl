@@ -53,22 +53,18 @@ struct ArrayMargins{T}
     di::DimIndices
 end
 
-# Constructor promoting vector to dimindices
-function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::Vector) where T
-    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(di))
+# Constructor for mixed-type arraymargins needs promotion before construction
+function ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndices) 
+    AT = eltype(am)
+    PT = promote_type(eltype.(am)...)
+    ArrayFactors(Vector{AT{PT}}(am), di)
 end
 
+# Constructor promoting vector to dimindices
+ArrayMargins(am::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(am, DimIndices(di))    
+
 # Constructor based on margins without indices
-function ArrayMargins(am::Vector{<:AbstractArray{T}}) where T 
-    nd = ndims.(am)
-    j = 0
-    di = []
-    for i in nd
-        push!(di, collect((j+1):(j+i)))
-        j += i
-    end
-    ArrayMargins(Vector{AbstractArray{T}}(am), DimIndices(di))
-end
+ArrayMargins(am::Vector{<:AbstractArray}) = ArrayMargins(am, default_dimindices(am)) 
 
 # Constructor based on array
 function ArrayMargins(X::AbstractArray, di::DimIndices)

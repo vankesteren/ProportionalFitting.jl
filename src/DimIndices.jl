@@ -42,6 +42,41 @@ function DimIndices(X::Vector{Union{Int, Vector{Int}}})
     DimIndices(broadcast((x) -> [x...], X))
 end
 
+"""
+    default_dimindices(m::Vector{<:AbstractArray})
+
+Create default dimensions from a vector of arrays. These dimensions
+are assumed to be ordered. For example, for 
+the dimensions will be [[1], [2], [3]]. For [[1, 2], [2 1 ; 3 4]], it
+will be [[1], [2, 3]].
+
+See also: [`DimIndices`](@ref)
+
+# Arguments
+- `m::Vector{<:AbstractArray}`: Array margins or factors.
+
+# Examples
+```julia-repl
+julia> default_dimindices([[1, 2], [2, 1], [3, 4]])
+Indices for 3D array:
+    [[1], [2], [3]]
+
+julia> default_dimindices([[1, 2], [2 1 ; 3 4]])
+Indices for 3D array:
+    [[1], [2, 3]]
+```
+"""
+function default_dimindices(m::Vector{<:AbstractArray})
+    nd = ndims.(m)
+    j = 0
+    dd = []
+    for i in nd
+        push!(dd, collect((j+1):(j+i)))
+        j += i
+    end
+    return DimIndices(dd)
+end
+
 # Base methods
 Base.ndims(DI::DimIndices) = maximum(maximum.(DI.idx))
 Base.length(DI::DimIndices) = length(DI.idx)

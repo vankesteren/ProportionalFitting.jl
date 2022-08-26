@@ -1,8 +1,10 @@
 module ItPropFit
-export ipf
-export ArrayFactors
-export ArrayMargins, isconsistent, proportion_transform
-export DimIndices
+
+export 
+    DimIndices,
+    ArrayMargins, isconsistent, proportion_transform,
+    ArrayFactors,
+    ipf
 
 include("DimIndices.jl")
 include("ArrayMargins.jl")

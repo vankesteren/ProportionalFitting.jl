@@ -53,9 +53,6 @@ struct ArrayFactors{T}
     di::DimIndices
 end
 
-# promoting constructor
-ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, DimIndices(getdims(af)))
-
 # Constructor for mixed-type arrayfactors needs promotion before construction
 function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices) 
     AT = eltype(af)
@@ -63,11 +60,11 @@ function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices)
     ArrayFactors(Vector{AT{PT}}(af), di)
 end
 
-# constructor based on arrays vararg
-function ArrayFactors(af::AbstractArray...)
-    v = [af...]
-    return ArrayFactors(v, DimIndices(getdims(v)))
-end
+# Constructor promoting vector to dimindices
+ArrayFactors(af::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(af, DimIndices(di))    
+
+# Constructor based on factors without dimindices
+ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, default_dimindices(af))
 
 # Overloading base methods
 function Base.eltype(::Type{ArrayFactors{T}}) where {T}

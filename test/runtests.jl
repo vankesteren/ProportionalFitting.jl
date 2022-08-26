@@ -54,7 +54,7 @@ end
     @test Array(fac) == [4 5 ; 8 10 ; 12 15]
 
     # constructors
-    fac2 = ArrayFactors([1,2,3], [4, 5])
+    fac2 = ArrayFactors([[1,2,3], [4, 5]])
     @test fac.af == fac2.af && fac.di.idx == fac2.di.idx
 
     fac3 = ArrayFactors([[4, 5], [1, 2, 3]], DimIndices([2, 1]))
