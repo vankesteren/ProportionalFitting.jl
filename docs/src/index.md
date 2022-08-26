@@ -42,7 +42,20 @@ Z = Array(fac) .* X
 We can then check that the marginal sum totals are correct:
 
 ```@example ex
-margins(Z)
+ArrayMargins(Z)
+```
+
+## Inconsistent margins
+If the margins are inconsistent (i.e., the margins do not sum to the same amounts) then both `X` and the margins will be transformed to proportions.
+```@example ex
+m = ArrayMargins([[12, 23, 14, 35], [17, 44, 12, 33]])
+af = ipf(X, m)
+```
+
+Then, `Z` needs to be computed in a different way as well:
+```@example ex
+X_prop = X ./ sum(X)
+Z = X_prop .* Array(af)
 ```
 
 ## Multidimensional arrays
@@ -65,3 +78,41 @@ And we can create the adjusted array `Z`:
 Array(fac) .* X
 ```
 
+## Multidimensional margins
+
+ItPropFit can also deal with multidimensional margins of arbitrary shape. For example, consider the same `(3, 2, 3)` array as before:
+```@example ex
+X = reshape(1:12, 2, 3, 2)
+```
+
+We have multidimensional target margins (a 1D vector and a 2D matrix):
+```@example ex
+m1 = [48, 60]
+m2 = [9 11 14; 19 25 30]
+mar = [m1, m2]
+```
+Here, `m1` belongs to the first dimension of target matrix, and `m2` belongs to the third and second dimension (in that order). This can be encoded in a `DimIndices` object as follows:
+```@example ex
+dimid = DimIndices([1, [3, 2]])
+```
+
+Together, the margins and dimension indices they belong to constitute an `ArrayMargins` object:
+```@example ex
+m = ArrayMargins(mar, dimid)
+```
+
+Now we can run `ipf` to compute the adjustment:
+```@example ex
+fac = ipf(X, m)
+```
+
+And we can create the adjusted array `Z`:
+
+```@example ex
+Z = Array(fac) .* X
+```
+
+We then also use `ArrayMargins` to check whether the margins of this array are indeed as expected!
+```@example ex
+ArrayMargins(Z, dimid)
+```

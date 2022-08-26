@@ -10,6 +10,8 @@ Multidimensional iterative proportional fitting in Julia.
 See the full documentation and getting started [here](https://vankesteren.github.io/ItPropFit.jl/).
 
 ```julia
+using ItPropFit
+
 # matrix to be adjusted
 X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
 
@@ -21,9 +23,10 @@ v = [200, 300, 400, 100]
 fac = ipf(X, [u, v])
 ```
 ```
-Factors for array of size (4, 4):
-  1: [0.9986403503185242, 0.8833622306385376, 1.1698911437112522, 0.8895042701910321]
-  2: [1.616160156063788, 1.5431801747375655, 1.771623700829941, 0.38299396265192226]
+[ Info: Converged in 8 iterations.
+Factors for 2D array:
+  [1]: [0.9986403503185242, 0.8833622306385376, 1.1698911437112522, 0.8895042701910321]
+  [2]: [1.616160156063788, 1.5431801747375655, 1.771623700829941, 0.38299396265192226]
 ```
 ```julia
 # compute adjusted matrix
@@ -38,10 +41,10 @@ Z = Array(fac) .* X
 ```
 ```julia
 # check that the margins are indeed [u, v]
-margins(Z)
+ArrayMargins(Z)
 ```
 ```
-2-element Vector{Vector{Float64}}:
- [150.0000000009452, 299.99999999962523, 399.99999999949796, 149.99999999993148]
- [200.0, 299.99999999999994, 399.99999999999994, 99.99999999999997]
+Margins of 2D array:
+  [1]: [150.0000000009452, 299.99999999962523, 399.99999999949796, 149.99999999993148]
+  [2]: [200.0, 299.99999999999994, 399.99999999999994, 99.99999999999997]
 ```

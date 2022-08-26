@@ -1,21 +1,9 @@
-"""
-    margins(X)
+# flatten nested tuples into single tuple
+# https://discourse.julialang.org/t/efficient-tuple-concatenation/5398/10
+flatten(x::Tuple) = x
+flatten(x::Tuple, y::Tuple) = (x..., y...)
+flatten(x::Tuple, y::Tuple, z::Tuple...) = (x..., flatten(y, z...)...)
 
-Compute the marginal sum totals for an array.
-
-# Arguments
-- `X::AbstractArray{<: Number}`: array with any number of dimensions
-
-# Examples
-```julia-repl
-julia> margins(reshape(1:12, 2, 3, 2))
-3-element Vector{Vector{Int64}}:
- [36, 42]
- [18, 26, 34]
- [21, 57]
-```
-"""
-function margins(X::AbstractArray{<: Real})
-    D = ndims(X)
-    return [vec(sum(X; dims = setdiff(1:D, d))) for d in 1:D]
-end
+# dict methods for future reference
+Base.Dict(AM::ArrayMargins) = Dict(AM.di[i] => AM.am[i] for i in 1:length(AM))
+Base.Dict(AF::ArrayFactors) = Dict(AF.di[i] => AF.af[i] for i in 1:length(AF))

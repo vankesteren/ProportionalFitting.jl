@@ -1,12 +1,12 @@
 name = "ItPropFit"
 uuid = "7a994e6b-35c0-41b3-a964-b7f62fc12992"
 authors = ["Erik-Jan van Kesteren <erikjanvankesteren@pm.me>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 
 [compat]
-julia = "1.7"
+julia = "1.8"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

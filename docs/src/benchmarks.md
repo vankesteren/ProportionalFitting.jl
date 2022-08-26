@@ -18,7 +18,7 @@ v = [200, 300, 400, 100]
 ```@example bench
 X = reshape(repeat(1:16, 625), 100, 100)
 Y = reshape(repeat(1:5, 2000), 100, 100) + X
-m = margins(Y)
+m = ArrayMargins(Y)
 @benchmark ipf(X, m)
 ```
 
@@ -26,6 +26,6 @@ m = margins(Y)
 ```@example bench
 X = reshape(repeat(1:12, 100), 6, 4, 2, 5, 5)
 Y = reshape(repeat(1:5, 240), 6, 4, 2, 5, 5) + X
-m = margins(Y)
+m = ArrayMargins(Y)
 @benchmark ipf(X, m)
 ```

@@ -24,5 +24,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/vankesteren/ItPropFit.jl",
-    devbranch="main",
+    devbranch="dev",
 )
