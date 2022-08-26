@@ -1,8 +1,8 @@
 """
-    ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndex)
-    ArrayMargins(am::Vector{<:AbstractArray{T}}, di::Vector)
+    ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndices)
+    ArrayMargins(am::Vector{<:AbstractArray}, di::Vector)
     ArrayMargins(am::Vector{<:AbstractArray})
-    ArrayMargins(X::AbstractArray, di::DimIndex)
+    ArrayMargins(X::AbstractArray, di::DimIndices)
     ArrayMargins(X::AbstractArray)
 
 ArrayMargins are marginal sums of an array, combined with the 

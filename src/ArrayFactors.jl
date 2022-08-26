@@ -1,5 +1,7 @@
 """
-    ArrayFactors(af::Vector{<:AbstractArray}), di::DimIndices)
+    ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices)
+    ArrayFactors(af::Vector{<:AbstractArray}, di::Vector)
+    ArrayFactors(af::Vector{<:AbstractArray})
 
 Array factors are defined such that the array's elements are their products:
 `M[i, j, ..., l] = af[1][i] * af[2][j] * ... * af[3][l]`. 
@@ -13,7 +15,7 @@ method.
 see also: [`ipf`](@ref), [`ArrayMargins`](@ref), [`DimIndices`](@ref)
 
 # Fields
-- `af::Vector{<:AbstractArray{T}}`: Vector of (multidimensional) array factors
+- `af::Vector{<:AbstractArray}`: Vector of (multidimensional) array factors
 - `di::DimIndices`: Dimension indices to which the array factors belong.
 
 # Examples
