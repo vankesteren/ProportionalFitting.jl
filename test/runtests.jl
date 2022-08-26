@@ -1,4 +1,5 @@
-using Test, ItPropFit
+using Test, ItPropFit, Logging
+Logging.disable_logging(Logging.Info)
 
 @testset "DimIndices" begin
     # Basic object & method
