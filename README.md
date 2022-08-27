@@ -1,6 +1,6 @@
 # ItPropFit.jl
 
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://USER_NAME.github.io/PACKAGE_NAME.jl/dev) [![CI](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vankesteren.github.io/ItPropFit.jl/dev) [![CI](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml)
 
 Multidimensional iterative proportional fitting in Julia. 
 
