@@ -4,12 +4,12 @@
     ArrayFactors(af::Vector{<:AbstractArray})
 
 Array factors are defined such that the array's elements are their products:
-`M[i, j, ..., l] = af[1][i] * af[2][j] * ... * af[3][l]`. 
+`M[i, j, ..., l] = af[1][i] * af[2][j] * ... * af[3][l]`.
 
 The array factors can be vectors or multidimensional arrays themselves.
 
-The main use of ArrayFactors is as a memory-efficient representation of a 
-multidimensional array, which can be constructed using the `Array()` 
+The main use of ArrayFactors is as a memory-efficient representation of a
+multidimensional array, which can be constructed using the `Array()`
 method.
 
 see also: [`ipf`](@ref), [`ArrayMargins`](@ref), [`DimIndices`](@ref)
@@ -56,14 +56,14 @@ struct ArrayFactors{T}
 end
 
 # Constructor for mixed-type arrayfactors needs promotion before construction
-function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices) 
+function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices)
     AT = eltype(af)
     PT = promote_type(eltype.(af)...)
     ArrayFactors(Vector{AT{PT}}(af), di)
 end
 
 # Constructor promoting vector to dimindices
-ArrayFactors(af::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(af, DimIndices(di))    
+ArrayFactors(af::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(af, DimIndices(di))
 
 # Constructor based on factors without dimindices
 ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, default_dimindices(af))
@@ -81,7 +81,12 @@ function Base.show(io::IO, AF::ArrayFactors)
     end
 end
 
-Base.size(AF::ArrayFactors) = flatten(size.(AF.af)...)[sortperm(vcat(AF.di.idx...))]
+function Base.size(AF::ArrayFactors)
+    sizes = vcat(collect.(size.(AF.af))...)
+    order = sortperm(vcat(AF.di.idx...))
+    return Tuple(sizes[order])
+end
+
 Base.length(AF::ArrayFactors) = length(AF.af)
 
 """

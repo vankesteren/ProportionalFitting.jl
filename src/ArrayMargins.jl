@@ -5,7 +5,7 @@
     ArrayMargins(X::AbstractArray, di::DimIndices)
     ArrayMargins(X::AbstractArray)
 
-ArrayMargins are marginal sums of an array, combined with the 
+ArrayMargins are marginal sums of an array, combined with the
 indices of the dimensions these sums belong to. The marginal
 sums can be multidimensional arrays themselves.
 
@@ -54,17 +54,17 @@ struct ArrayMargins{T}
 end
 
 # Constructor for mixed-type arraymargins needs promotion before construction
-function ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndices) 
+function ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndices)
     AT = eltype(am)
     PT = promote_type(eltype.(am)...)
     ArrayFactors(Vector{AT{PT}}(am), di)
 end
 
 # Constructor promoting vector to dimindices
-ArrayMargins(am::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(am, DimIndices(di))    
+ArrayMargins(am::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(am, DimIndices(di))
 
 # Constructor based on margins without indices
-ArrayMargins(am::Vector{<:AbstractArray}) = ArrayMargins(am, default_dimindices(am)) 
+ArrayMargins(am::Vector{<:AbstractArray}) = ArrayMargins(am, default_dimindices(am))
 
 # Constructor based on array
 function ArrayMargins(X::AbstractArray, di::DimIndices)
@@ -78,7 +78,7 @@ function ArrayMargins(X::AbstractArray, di::DimIndices)
     for dim in di.idx
         notd = Tuple(setdiff(1:D, dim))
         mar = dropdims(sum(X; dims = notd); dims = notd)
-        if !issorted(dim) 
+        if !issorted(dim)
             mar = permutedims(mar, sortperm(sortperm(dim)))
         end
         push!(am, mar)
@@ -96,7 +96,11 @@ function Base.show(io::IO, AM::ArrayMargins)
         show(io, AM.am[i])
     end
 end
-Base.size(AM::ArrayMargins) = flatten(size.(AM.am)...)[sortperm(vcat(AM.di.idx...))]
+function Base.size(AM::ArrayMargins)
+    sizes = vcat(collect.(size.(AM.am))...)
+    order = sortperm(vcat(AM.di.idx...))
+    return Tuple(sizes[order])
+end
 Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))
 
