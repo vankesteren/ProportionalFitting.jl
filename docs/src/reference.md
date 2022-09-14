@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = ItPropFit
+CurrentModule = ProportionalFitting
 ```
 
 # Reference
@@ -8,5 +8,5 @@ CurrentModule = ItPropFit
 ```
 
 ```@autodocs
-Modules = [ItPropFit]
+Modules = [ProportionalFitting]
 ```

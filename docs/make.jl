@@ -1,16 +1,16 @@
-using ItPropFit
+using ProportionalFitting
 using Documenter
 
-DocMeta.setdocmeta!(ItPropFit, :DocTestSetup, :(using ItPropFit); recursive=true)
+DocMeta.setdocmeta!(ProportionalFitting, :DocTestSetup, :(using ProportionalFitting); recursive=true)
 
 makedocs(;
-    modules=[ItPropFit],
+    modules=[ProportionalFitting],
     authors="Erik-Jan van Kesteren",
-    repo="https://github.com/vankesteren/ItPropFit.jl/blob/{commit}{path}#{line}",
-    sitename="ItPropFit.jl",
+    repo="https://github.com/vankesteren/ProportionalFitting.jl/blob/{commit}{path}#{line}",
+    sitename="ProportionalFitting.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://vankesteren.github.io/ItPropFit.jl",
+        canonical="https://vankesteren.github.io/ProportionalFitting.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -23,7 +23,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/vankesteren/ItPropFit.jl",
+    repo="github.com/vankesteren/ProportionalFitting.jl",
     devbranch="main",
     versions = ["stable" => "v^", "v#.#.#"]
 )

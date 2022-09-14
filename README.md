@@ -1,16 +1,18 @@
-# ItPropFit.jl
+# ProportionalFitting.jl
 
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vankesteren.github.io/ItPropFit.jl/dev) [![CI](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ItPropFit.jl/actions/workflows/CI.yml)
+[![CI](https://github.com/vankesteren/ProportionalFitting.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ProportionalFitting.jl/actions/workflows/CI.yml)
+[![stabledoc](https://img.shields.io/badge/docs-stable-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/stable)
+[![devdoc](https://img.shields.io/badge/docs-dev-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/dev)
 
 Multidimensional iterative proportional fitting in Julia. 
 
-[ItPropFit](https://github.com/vankesteren/ItPropFit.jl) implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)) for performing iterative proportional fitting (also called RAS algorithm, raking, matrix scaling)
+[ProportionalFitting](https://github.com/vankesteren/ProportionalFitting.jl) implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)) for performing iterative proportional fitting (also called RAS algorithm, raking, matrix scaling)
 
 ## Showcase
-See the full documentation and getting started [here](https://vankesteren.github.io/ItPropFit.jl/).
+See the full documentation and getting started [here](https://vankesteren.github.io/ProportionalFitting.jl/).
 
 ```julia
-using ItPropFit
+using ProportionalFitting
 
 # matrix to be adjusted
 X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]

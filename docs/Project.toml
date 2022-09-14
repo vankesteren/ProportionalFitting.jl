@@ -2,6 +2,5 @@
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 FreqTables = "da1fdf0e-e0ff-5433-a45f-9bb5ff651cb1"
-ItPropFit = "7a994e6b-35c0-41b3-a964-b7f62fc12992"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 StatsKit = "2cb19f9e-ec4d-5c53-8573-a4542a68d3f0"

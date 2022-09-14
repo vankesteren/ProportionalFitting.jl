@@ -3,7 +3,7 @@
 ## Regression poststratification
 
 ```@example pstrat
-using StatsKit, FreqTables, ItPropFit
+using StatsKit, FreqTables, ProportionalFitting
 ```
 
 First, we generate some fake data with demographic characteristics.
@@ -25,7 +25,7 @@ df.opn = 1.5 .+ log.(df.inc) .* .1 + rand(p_opn, N)
 df
 ```
 
-Then, we create post-stratification weights based on population-level margins using the background characteristics through ItPropFit.
+Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.
 ```@example pstrat
 # Create a cross-table of background characteristics
 tab = freqtable(df, :sex, :edu, :age)

@@ -1,6 +1,6 @@
-module ItPropFit
+module ProportionalFitting
 
-export 
+export
     DimIndices,
     ArrayMargins, isconsistent, proportion_transform,
     ArrayFactors,

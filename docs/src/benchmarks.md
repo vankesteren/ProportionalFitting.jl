@@ -1,6 +1,6 @@
 # Benchmarks
 ```@setup bench
-using BenchmarkTools, ItPropFit, Logging
+using BenchmarkTools, ProportionalFitting, Logging
 Logging.disable_logging(Logging.Info)
 ```
 
