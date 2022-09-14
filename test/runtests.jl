@@ -1,4 +1,4 @@
-using Test, ItPropFit
+using Test, ProportionalFitting
 
 @testset "DimIndices" begin
     # Basic object & method
@@ -9,7 +9,7 @@ using Test, ItPropFit
 
     # test completeness
     @test_throws ErrorException DimIndices([2, 1, [5, 4, 6]])
-    
+
     # test uniqueness
     @test_throws ErrorException DimIndices([[2, 3, 2], 1, [5, 4, 6]])
 end
@@ -21,10 +21,10 @@ end
     @test typeof(mar) == ArrayMargins{Int}
     @test length(mar) == 2
     @test size(mar) == (3, 4)
-    
+
     # Consistency check
     @test isconsistent(mar)
-    
+
     mar_p = proportion_transform(mar)
     @test sum.(mar_p.am) == [1., 1.]
 
@@ -100,7 +100,7 @@ end
 
     # Inconsistent margins
     w = [15, 30, 40, 15]
-    AF = ipf(X, [w, v]) 
+    AF = ipf(X, [w, v])
     AM = ArrayMargins(X ./ sum(X) .* Array(AF))
     @test AM.am ≈ [w ./ sum(w), v ./ sum(v)]
 
@@ -111,7 +111,7 @@ end
     AF = ipf(X, m)
     X_prime = Array(AF) .* X
     AM = ArrayMargins(X_prime)
-    @test AM.am ≈ m.am    
+    @test AM.am ≈ m.am
 end
 
 @testset "Multidimensional ipf" begin
@@ -148,4 +148,3 @@ end
     AM = ArrayMargins(X_prime, di)
     @test AM.am ≈ m.am
 end
-
