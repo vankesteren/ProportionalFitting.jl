@@ -2,7 +2,7 @@
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "2db57b278500865321daf7b4ddb94ab35e2e6dbe"
+project_hash = "117d3f62c1a52d55b97b2405e9c55ae797ea04c3"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -391,13 +391,6 @@ git-tree-sha1 = "7fd44fd4ff43fc60815f8e764c0f352b83c49151"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.1.1"
 
-[[deps.ItPropFit]]
-git-tree-sha1 = "236ecc963e33a7fbe97db73c4fa58fd00fcdcc78"
-repo-rev = "rename_package"
-repo-url = ".."
-uuid = "7a994e6b-35c0-41b3-a964-b7f62fc12992"
-version = "0.2.1"
-
 [[deps.IteratorInterfaceExtensions]]
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
@@ -657,6 +650,13 @@ deps = ["Distributed", "Printf"]
 git-tree-sha1 = "d7a7aef8f8f2d537104f170139553b14dfe39fe9"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
 version = "1.7.2"
+
+[[deps.ProportionalFitting]]
+git-tree-sha1 = "acb3da183191aa10cf4f35d3c26395440d088671"
+repo-rev = "rename_package"
+repo-url = ".."
+uuid = "3c40d49d-59d4-4b5d-adaa-75a7fbc8c64f"
+version = "0.3.0"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
