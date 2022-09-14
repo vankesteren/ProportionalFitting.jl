@@ -8,6 +8,8 @@ Multidimensional iterative proportional fitting in Julia.
 
 [ProportionalFitting](https://github.com/vankesteren/ProportionalFitting.jl) implements a multidimensional version of the [factor estimation method](https://en.wikipedia.org/wiki/Iterative_proportional_fitting#Algorithm_2_(factor_estimation)) for performing iterative proportional fitting (also called RAS algorithm, raking, matrix scaling)
 
+> Before version `0.3.0`, this package was called `ItPropFit.jl`.
+
 ## Showcase
 See the full documentation and getting started [here](https://vankesteren.github.io/ProportionalFitting.jl/).
 
