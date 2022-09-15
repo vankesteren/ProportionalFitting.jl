@@ -652,8 +652,8 @@ uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
 version = "1.7.2"
 
 [[deps.ProportionalFitting]]
-git-tree-sha1 = "acb3da183191aa10cf4f35d3c26395440d088671"
-repo-rev = "rename_package"
+git-tree-sha1 = "2eade86974ebe6cdd37f0f7592e55355f427c93b"
+repo-rev = "main"
 repo-url = ".."
 uuid = "3c40d49d-59d4-4b5d-adaa-75a7fbc8c64f"
 version = "0.3.0"

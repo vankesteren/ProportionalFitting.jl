@@ -1,7 +1,7 @@
 # ProportionalFitting.jl
 
 [![CI](https://github.com/vankesteren/ProportionalFitting.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ProportionalFitting.jl/actions/workflows/CI.yml)
-[![stabledoc](https://img.shields.io/badge/docs-stable-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/stable)
+<!-- [![stabledoc](https://img.shields.io/badge/docs-stable-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/stable) -->
 [![devdoc](https://img.shields.io/badge/docs-dev-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/dev)
 
 Multidimensional iterative proportional fitting in Julia. 

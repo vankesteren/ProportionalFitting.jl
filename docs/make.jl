@@ -21,10 +21,12 @@ makedocs(;
     modules = [ProportionalFitting],
     authors = "Erik-Jan van Kesteren",
     repo = "https://github.com/vankesteren/ProportionalFitting.jl",
-    devbranch = "main",
     sitename = "ProportionalFitting.jl",
     format = frmt,
     pages = pgs,
 )
 
-deploydocs(; repo = "github.com/vankesteren/ProportionalFitting.jl")
+deploydocs(;
+    repo = "github.com/vankesteren/ProportionalFitting.jl",
+    devbranch = "main",
+)
