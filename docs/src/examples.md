@@ -22,7 +22,8 @@ df = DataFrame(
 )
 df.opn = 1.5 .+ log.(df.inc) .* .1 + rand(p_opn, N)
 
-df
+# show the first 6 rows
+first(df, 6)
 ```
 
 Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.

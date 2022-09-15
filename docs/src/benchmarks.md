@@ -4,7 +4,7 @@ using BenchmarkTools, ProportionalFitting, Logging
 Logging.disable_logging(Logging.Info)
 ```
 
-The benchmarks below were run on Julia 1.7.2.
+The benchmarks below were run on Julia 1.8.0.
 
 ### Default example
 ```@example bench
