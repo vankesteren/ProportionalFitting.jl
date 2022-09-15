@@ -13,7 +13,8 @@ df = DataFrame(
 )
 df.opn = 1.5 .+ log.(df.inc) .* .1 + rand(p_opn, N)
 
-df</code></pre><div class="data-frame"><p>100 rows × 5 columns</p><table class="data-frame"><thead><tr><th></th><th>sex</th><th>edu</th><th>age</th><th>inc</th><th>opn</th></tr><tr><th></th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>m</td><td>lo</td><td>26&lt;50</td><td>139.634</td><td>2.76787</td></tr><tr><th>2</th><td>m</td><td>med</td><td>11&lt;25</td><td>39.0155</td><td>0.458724</td></tr><tr><th>3</th><td>m</td><td>lo</td><td>11&lt;25</td><td>14.8838</td><td>0.945945</td></tr><tr><th>4</th><td>m</td><td>no</td><td>51&lt;70</td><td>45.2245</td><td>2.83966</td></tr><tr><th>5</th><td>f</td><td>lo</td><td>26&lt;50</td><td>4067.47</td><td>-1.1993</td></tr><tr><th>6</th><td>m</td><td>lo</td><td>&lt;10</td><td>1217.02</td><td>8.21505</td></tr><tr><th>7</th><td>m</td><td>hi</td><td>51&lt;70</td><td>11.076</td><td>7.32566</td></tr><tr><th>8</th><td>f</td><td>med</td><td>&gt;70</td><td>6.35795</td><td>-0.940141</td></tr><tr><th>9</th><td>m</td><td>med</td><td>11&lt;25</td><td>354.583</td><td>2.89544</td></tr><tr><th>10</th><td>m</td><td>med</td><td>51&lt;70</td><td>56.1462</td><td>3.60394</td></tr><tr><th>11</th><td>f</td><td>hi</td><td>11&lt;25</td><td>25.6713</td><td>5.7622</td></tr><tr><th>12</th><td>f</td><td>no</td><td>26&lt;50</td><td>1184.57</td><td>2.20553</td></tr><tr><th>13</th><td>m</td><td>no</td><td>11&lt;25</td><td>498.807</td><td>4.51402</td></tr><tr><th>14</th><td>f</td><td>med</td><td>&lt;10</td><td>6.72692</td><td>2.37418</td></tr><tr><th>15</th><td>f</td><td>med</td><td>26&lt;50</td><td>3395.8</td><td>-1.0118</td></tr><tr><th>16</th><td>f</td><td>hi</td><td>51&lt;70</td><td>113.125</td><td>-6.90516</td></tr><tr><th>17</th><td>f</td><td>hi</td><td>51&lt;70</td><td>14.0929</td><td>-1.67783</td></tr><tr><th>18</th><td>f</td><td>lo</td><td>11&lt;25</td><td>152.35</td><td>7.1921</td></tr><tr><th>19</th><td>f</td><td>lo</td><td>11&lt;25</td><td>0.0761062</td><td>2.21708</td></tr><tr><th>20</th><td>f</td><td>med</td><td>11&lt;25</td><td>4762.2</td><td>3.00047</td></tr><tr><th>21</th><td>m</td><td>lo</td><td>26&lt;50</td><td>90.0624</td><td>8.83541</td></tr><tr><th>22</th><td>m</td><td>med</td><td>26&lt;50</td><td>5054.36</td><td>-2.19126</td></tr><tr><th>23</th><td>f</td><td>med</td><td>26&lt;50</td><td>4262.82</td><td>4.73252</td></tr><tr><th>24</th><td>m</td><td>lo</td><td>11&lt;25</td><td>1229.9</td><td>-3.01923</td></tr><tr><th>25</th><td>m</td><td>no</td><td>&lt;10</td><td>113.244</td><td>8.33165</td></tr><tr><th>26</th><td>m</td><td>med</td><td>26&lt;50</td><td>3133.73</td><td>-3.47113</td></tr><tr><th>27</th><td>f</td><td>hi</td><td>&lt;10</td><td>164.503</td><td>-1.64073</td></tr><tr><th>28</th><td>f</td><td>med</td><td>11&lt;25</td><td>1505.19</td><td>0.846536</td></tr><tr><th>29</th><td>f</td><td>lo</td><td>11&lt;25</td><td>21.3443</td><td>0.575332</td></tr><tr><th>30</th><td>m</td><td>med</td><td>11&lt;25</td><td>220.229</td><td>1.83006</td></tr><tr><th>31</th><td>f</td><td>lo</td><td>26&lt;50</td><td>19.0936</td><td>8.62412</td></tr><tr><th>32</th><td>m</td><td>med</td><td>11&lt;25</td><td>0.769516</td><td>6.03808</td></tr><tr><th>33</th><td>f</td><td>hi</td><td>26&lt;50</td><td>2384.38</td><td>-4.26091</td></tr><tr><th>34</th><td>m</td><td>hi</td><td>&lt;10</td><td>683.704</td><td>-0.85801</td></tr><tr><th>35</th><td>m</td><td>hi</td><td>11&lt;25</td><td>0.241532</td><td>-3.88644</td></tr><tr><th>36</th><td>f</td><td>hi</td><td>51&lt;70</td><td>23785.1</td><td>6.18928</td></tr><tr><th>37</th><td>m</td><td>lo</td><td>51&lt;70</td><td>4.91497</td><td>3.92338</td></tr><tr><th>38</th><td>m</td><td>hi</td><td>26&lt;50</td><td>622.987</td><td>-1.72415</td></tr><tr><th>39</th><td>f</td><td>med</td><td>&lt;10</td><td>429.338</td><td>4.17226</td></tr><tr><th>40</th><td>f</td><td>hi</td><td>51&lt;70</td><td>116.167</td><td>6.318</td></tr><tr><th>41</th><td>f</td><td>med</td><td>11&lt;25</td><td>86.0063</td><td>2.55889</td></tr><tr><th>42</th><td>f</td><td>med</td><td>51&lt;70</td><td>53.6266</td><td>-1.01874</td></tr><tr><th>43</th><td>m</td><td>med</td><td>26&lt;50</td><td>4.30793</td><td>2.52071</td></tr><tr><th>44</th><td>f</td><td>hi</td><td>11&lt;25</td><td>679.562</td><td>0.409812</td></tr><tr><th>45</th><td>m</td><td>lo</td><td>11&lt;25</td><td>22.7931</td><td>2.96918</td></tr><tr><th>46</th><td>f</td><td>hi</td><td>51&lt;70</td><td>99.1102</td><td>0.881607</td></tr><tr><th>47</th><td>m</td><td>hi</td><td>11&lt;25</td><td>212.969</td><td>4.33489</td></tr><tr><th>48</th><td>f</td><td>med</td><td>11&lt;25</td><td>3474.88</td><td>1.32461</td></tr><tr><th>49</th><td>f</td><td>med</td><td>&lt;10</td><td>81.9859</td><td>2.43774</td></tr><tr><th>50</th><td>m</td><td>lo</td><td>51&lt;70</td><td>128.254</td><td>7.16536</td></tr><tr><th>51</th><td>f</td><td>med</td><td>51&lt;70</td><td>22739.2</td><td>-0.317459</td></tr><tr><th>52</th><td>f</td><td>lo</td><td>26&lt;50</td><td>218.781</td><td>-0.642518</td></tr><tr><th>53</th><td>m</td><td>hi</td><td>11&lt;25</td><td>0.0144075</td><td>1.70903</td></tr><tr><th>54</th><td>m</td><td>no</td><td>26&lt;50</td><td>81.6033</td><td>5.12695</td></tr><tr><th>55</th><td>m</td><td>lo</td><td>11&lt;25</td><td>20.4238</td><td>2.60262</td></tr><tr><th>56</th><td>m</td><td>med</td><td>51&lt;70</td><td>1796.58</td><td>0.622867</td></tr><tr><th>57</th><td>m</td><td>med</td><td>51&lt;70</td><td>10.051</td><td>1.507</td></tr><tr><th>58</th><td>m</td><td>lo</td><td>51&lt;70</td><td>3.9492</td><td>-2.1713</td></tr><tr><th>59</th><td>m</td><td>med</td><td>51&lt;70</td><td>24.3472</td><td>6.62258</td></tr><tr><th>60</th><td>f</td><td>hi</td><td>11&lt;25</td><td>40112.5</td><td>5.19279</td></tr><tr><th>61</th><td>m</td><td>lo</td><td>26&lt;50</td><td>990.228</td><td>1.47565</td></tr><tr><th>62</th><td>f</td><td>med</td><td>11&lt;25</td><td>578.562</td><td>2.03323</td></tr><tr><th>63</th><td>f</td><td>lo</td><td>26&lt;50</td><td>381.282</td><td>0.502525</td></tr><tr><th>64</th><td>f</td><td>lo</td><td>&lt;10</td><td>1061.81</td><td>1.02592</td></tr><tr><th>65</th><td>f</td><td>lo</td><td>11&lt;25</td><td>11011.8</td><td>6.44637</td></tr><tr><th>66</th><td>f</td><td>med</td><td>11&lt;25</td><td>51.7468</td><td>4.29069</td></tr><tr><th>67</th><td>f</td><td>med</td><td>26&lt;50</td><td>220.475</td><td>-0.196534</td></tr><tr><th>68</th><td>m</td><td>lo</td><td>11&lt;25</td><td>189.353</td><td>7.02472</td></tr><tr><th>69</th><td>f</td><td>med</td><td>51&lt;70</td><td>605.607</td><td>-1.89292</td></tr><tr><th>70</th><td>f</td><td>no</td><td>11&lt;25</td><td>22.3074</td><td>3.51615</td></tr><tr><th>71</th><td>f</td><td>lo</td><td>&lt;10</td><td>279.428</td><td>1.1248</td></tr><tr><th>72</th><td>m</td><td>hi</td><td>11&lt;25</td><td>2.79483e5</td><td>1.30033</td></tr><tr><th>73</th><td>m</td><td>hi</td><td>&gt;70</td><td>362.201</td><td>4.09577</td></tr><tr><th>74</th><td>m</td><td>lo</td><td>26&lt;50</td><td>5.13137</td><td>-3.41901</td></tr><tr><th>75</th><td>m</td><td>med</td><td>&gt;70</td><td>1962.53</td><td>-0.503299</td></tr><tr><th>76</th><td>m</td><td>med</td><td>26&lt;50</td><td>7768.85</td><td>2.58213</td></tr><tr><th>77</th><td>f</td><td>lo</td><td>51&lt;70</td><td>99.1595</td><td>-5.46055</td></tr><tr><th>78</th><td>m</td><td>hi</td><td>26&lt;50</td><td>5538.29</td><td>1.54694</td></tr><tr><th>79</th><td>f</td><td>lo</td><td>26&lt;50</td><td>8.66753</td><td>6.50546</td></tr><tr><th>80</th><td>m</td><td>hi</td><td>51&lt;70</td><td>1810.23</td><td>3.37642</td></tr><tr><th>81</th><td>m</td><td>no</td><td>51&lt;70</td><td>89.4308</td><td>2.9286</td></tr><tr><th>82</th><td>m</td><td>lo</td><td>26&lt;50</td><td>95.5347</td><td>-0.0164024</td></tr><tr><th>83</th><td>f</td><td>lo</td><td>11&lt;25</td><td>20.6339</td><td>-0.284724</td></tr><tr><th>84</th><td>f</td><td>lo</td><td>11&lt;25</td><td>9.116</td><td>3.26652</td></tr><tr><th>85</th><td>m</td><td>hi</td><td>26&lt;50</td><td>1492.98</td><td>0.68152</td></tr><tr><th>86</th><td>m</td><td>hi</td><td>&gt;70</td><td>998.036</td><td>1.51611</td></tr><tr><th>87</th><td>f</td><td>med</td><td>&gt;70</td><td>576.776</td><td>1.12226</td></tr><tr><th>88</th><td>m</td><td>hi</td><td>11&lt;25</td><td>132.231</td><td>4.21904</td></tr><tr><th>89</th><td>m</td><td>no</td><td>51&lt;70</td><td>661.267</td><td>2.81096</td></tr><tr><th>90</th><td>f</td><td>lo</td><td>11&lt;25</td><td>248.896</td><td>-2.48764</td></tr><tr><th>91</th><td>m</td><td>lo</td><td>26&lt;50</td><td>788.294</td><td>4.36877</td></tr><tr><th>92</th><td>m</td><td>med</td><td>26&lt;50</td><td>45.6897</td><td>-1.43728</td></tr><tr><th>93</th><td>m</td><td>no</td><td>&gt;70</td><td>244.524</td><td>3.31659</td></tr><tr><th>94</th><td>m</td><td>med</td><td>26&lt;50</td><td>10553.8</td><td>4.85773</td></tr><tr><th>95</th><td>f</td><td>hi</td><td>26&lt;50</td><td>1.16639</td><td>2.05982</td></tr><tr><th>96</th><td>f</td><td>no</td><td>&lt;10</td><td>22.4011</td><td>-1.15749</td></tr><tr><th>97</th><td>f</td><td>med</td><td>11&lt;25</td><td>1356.74</td><td>-1.62035</td></tr><tr><th>98</th><td>f</td><td>lo</td><td>26&lt;50</td><td>2.60762</td><td>2.89058</td></tr><tr><th>99</th><td>m</td><td>med</td><td>&gt;70</td><td>7003.81</td><td>7.28372</td></tr><tr><th>100</th><td>f</td><td>med</td><td>26&lt;50</td><td>460.847</td><td>5.20024</td></tr></tbody></table></div><p>Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.</p><pre><code class="language-julia hljs"># Create a cross-table of background characteristics
+# show the first 6 rows
+first(df, 6)</code></pre><div class="data-frame"><p>6 rows × 5 columns</p><table class="data-frame"><thead><tr><th></th><th>sex</th><th>edu</th><th>age</th><th>inc</th><th>opn</th></tr><tr><th></th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>f</td><td>med</td><td>26&lt;50</td><td>104.464</td><td>1.19489</td></tr><tr><th>2</th><td>m</td><td>lo</td><td>11&lt;25</td><td>439.248</td><td>1.1859</td></tr><tr><th>3</th><td>m</td><td>lo</td><td>26&lt;50</td><td>10.442</td><td>4.55404</td></tr><tr><th>4</th><td>f</td><td>hi</td><td>11&lt;25</td><td>52.9937</td><td>3.15767</td></tr><tr><th>5</th><td>f</td><td>hi</td><td>&gt;70</td><td>596.067</td><td>-0.939874</td></tr><tr><th>6</th><td>m</td><td>med</td><td>51&lt;70</td><td>822.406</td><td>0.674806</td></tr></tbody></table></div><p>Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.</p><pre><code class="language-julia hljs"># Create a cross-table of background characteristics
 tab = freqtable(df, :sex, :edu, :age)
 
 # Create margins from the population (aggregates obtained from statistical agency)
@@ -28,43 +29,43 @@ tab_adj = Array(fac) .* tab</code></pre><pre class="documenter-example-output"><
 [:, :, age=&quot;11&lt;25&quot;] =
 sex ╲ edu │       &quot;hi&quot;        &quot;lo&quot;       &quot;med&quot;        &quot;no&quot;
 ──────────┼───────────────────────────────────────────────
-&quot;f&quot;       │ 0.00201788   0.0213994    0.034689  0.00797924
-&quot;m&quot;       │ 0.00245552   0.0111602   0.0144728  0.00582586
+&quot;f&quot;       │ 0.00427467  0.00968075   0.0325894         0.0
+&quot;m&quot;       │ 0.00287211   0.0097566   0.0145977   0.0262288
 
 [:, :, age=&quot;26&lt;50&quot;] =
 sex ╲ edu │       &quot;hi&quot;        &quot;lo&quot;       &quot;med&quot;        &quot;no&quot;
 ──────────┼───────────────────────────────────────────────
-&quot;f&quot;       │ 0.00299312   0.0408108   0.0441036   0.0177534
-&quot;m&quot;       │ 0.00327804   0.0297971   0.0483018   0.0129622
+&quot;f&quot;       │ 0.00236449   0.0240966    0.072106   0.0323896
+&quot;m&quot;       │  0.0111207    0.021587   0.0363355         0.0
 
 [:, :, age=&quot;51&lt;70&quot;] =
 sex ╲ edu │       &quot;hi&quot;        &quot;lo&quot;       &quot;med&quot;        &quot;no&quot;
 ──────────┼───────────────────────────────────────────────
-&quot;f&quot;       │  0.0220839   0.0200741   0.0976217         0.0
-&quot;m&quot;       │ 0.00644962   0.0439699   0.0950351    0.114766
+&quot;f&quot;       │  0.0126072   0.0214135   0.0720867   0.0431746
+&quot;m&quot;       │ 0.00423534   0.0431625    0.145303   0.0580171
 ⋮</code></pre><p>Create weights by looking up the adjusted counts and then performing normalization.</p><pre><code class="language-julia hljs"># Create a poststratification weight variable by lookup from the table
 df.w = [tab_adj[row...] for row in eachrow(df[:, [:sex, :edu, :age]])]
 df.w = df.w ./ sum(df.w) .* N # normalize the weights</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">100-element Vector{Float64}:
- 0.8970125059266058
- 0.4356903476719529
- 0.3359679153720826
- 3.454914543130623
- 1.2285693225761094
- 0.2639754286076864
- 0.1941595682087667
- 1.8682404176578022
- 0.4356903476719529
- 2.8609411141355823
+ 1.7388231714332847
+ 0.2352785606449094
+ 0.5205675123318659
+ 0.10308288691544068
+ 0.22609342807495414
+ 3.5039545271120556
+ 0.2681744624437338
+ 0.35202016668026015
+ 0.5810857611496338
+ 0.7349882218332857
  ⋮
- 1.4540811513966367
- 1.0981678526062504
- 1.4540811513966367
- 0.09010490503086628
- 0.9436739071342043
- 1.0442804705312942
- 1.2285693225761094
- 1.3640540976577873
- 1.327695718353209</code></pre><p>Let&#39;s take a look at how our regression estimates change!</p><pre><code class="language-julia hljs"># perform unweighted regression
+ 0.7858880996208432
+ 0.5205675123318659
+ 3.5039545271120556
+ 0.06926034708636546
+ 0.7349882218332857
+ 0.23344953046359881
+ 1.15206475060866
+ 1.040856248510136
+ 0.35202016668026015</code></pre><p>Let&#39;s take a look at how our regression estimates change!</p><pre><code class="language-julia hljs"># perform unweighted regression
 frm = @formula(opn ~ log(inc))
 res = lm(frm, df)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}, Vector{Int64}}}}, Matrix{Float64}}
 
@@ -74,17 +75,17 @@ Coefficients:
 ───────────────────────────────────────────────────────────────────────────
                    Coef.  Std. Error      t  Pr(&gt;|t|)  Lower 95%  Upper 95%
 ───────────────────────────────────────────────────────────────────────────
-(Intercept)   2.04214       0.691688   2.95    0.0039   0.669506   3.41477
-log(inc)     -0.00298245    0.117957  -0.03    0.9799  -0.237064   0.231099
+(Intercept)   1.48864      0.533656    2.79    0.0063   0.429622   2.54767
+log(inc)     -0.00802572   0.0874828  -0.09    0.9271  -0.181632   0.165581
 ───────────────────────────────────────────────────────────────────────────</code></pre><pre><code class="language-julia hljs"># perform weighted regression
 res_w = lm(frm, df, wts = df.w)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}, Vector{Int64}}}}, Matrix{Float64}}
 
 opn ~ 1 + :(log(inc))
 
 Coefficients:
-─────────────────────────────────────────────────────────────────────────
-                 Coef.  Std. Error      t  Pr(&gt;|t|)  Lower 95%  Upper 95%
-─────────────────────────────────────────────────────────────────────────
-(Intercept)   2.5222      0.711699   3.54    0.0006   1.10986    3.93454
-log(inc)     -0.110304    0.123047  -0.90    0.3722  -0.354487   0.133878
-─────────────────────────────────────────────────────────────────────────</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../benchmarks/">Benchmarks »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 15 September 2022 10:43">Thursday 15 September 2022</span>. Using Julia version 1.8.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+────────────────────────────────────────────────────────────────────────
+                 Coef.  Std. Error     t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+────────────────────────────────────────────────────────────────────────
+(Intercept)  1.25907     0.46962    2.68    0.0086   0.327128   2.19102
+log(inc)     0.0176023   0.0732467  0.24    0.8106  -0.127753   0.162958
+────────────────────────────────────────────────────────────────────────</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../benchmarks/">Benchmarks »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 15 September 2022 20:09">Thursday 15 September 2022</span>. Using Julia version 1.8.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
