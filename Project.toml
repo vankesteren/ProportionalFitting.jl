@@ -1,7 +1,7 @@
 name = "ProportionalFitting"
 uuid = "3c40d49d-59d4-4b5d-adaa-75a7fbc8c64f"
 authors = ["Erik-Jan van Kesteren <erikjanvankesteren@pm.me>"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 

@@ -57,7 +57,7 @@ end
 function ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndices)
     AT = eltype(am)
     PT = promote_type(eltype.(am)...)
-    ArrayFactors(Vector{AT{PT}}(am), di)
+    ArrayMargins(Vector{AT{PT}}(am), di)
 end
 
 # Constructor promoting vector to dimindices
