@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · ProportionalFitting.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://vankesteren.github.io/ProportionalFitting.jl/examples/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">ProportionalFitting.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Regression-poststratification"><span>Regression poststratification</span></a></li></ul></li><li><a class="tocitem" href="../benchmarks/">Benchmarks</a></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/vankesteren/ProportionalFitting.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><h2 id="Regression-poststratification"><a class="docs-heading-anchor" href="#Regression-poststratification">Regression poststratification</a><a id="Regression-poststratification-1"></a><a class="docs-heading-anchor-permalink" href="#Regression-poststratification" title="Permalink"></a></h2><pre><code class="language-julia hljs">using StatsKit, FreqTables, ProportionalFitting</code></pre><p>First, we generate some fake data with demographic characteristics.</p><pre><code class="language-julia hljs">N = 100
+p_sex = Categorical([0.49, 0.51])
+p_edu = Categorical([0.1, 0.3, 0.4, 0.2])
+p_age = Categorical([0.1, 0.3, 0.3, 0.2, 0.1])
+p_inc = LogNormal(5, 3)
+p_opn = Normal(0, 3)
+df = DataFrame(
+    :sex =&gt; CategoricalArray([&quot;m&quot;, &quot;f&quot;][rand(p_sex, N)]),
+    :edu =&gt; CategoricalArray([&quot;no&quot;, &quot;lo&quot;, &quot;med&quot;, &quot;hi&quot;][rand(p_edu, N)], ordered = true),
+    :age =&gt; CategoricalArray([&quot;&lt;10&quot;, &quot;11&lt;25&quot;, &quot;26&lt;50&quot;, &quot;51&lt;70&quot;, &quot;&gt;70&quot;][rand(p_age, N)], ordered = true),
+    :inc =&gt; rand(p_inc, N)
+)
+df.opn = 1.5 .+ log.(df.inc) .* .1 + rand(p_opn, N)
+
+# show the first 6 rows
+first(df, 6)</code></pre><div class="data-frame"><p>6 rows × 5 columns</p><table class="data-frame"><thead><tr><th></th><th>sex</th><th>edu</th><th>age</th><th>inc</th><th>opn</th></tr><tr><th></th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="CategoricalArrays.CategoricalValue{String, UInt32}">Cat…</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>f</td><td>med</td><td>&lt;10</td><td>1.49842</td><td>3.25607</td></tr><tr><th>2</th><td>f</td><td>med</td><td>11&lt;25</td><td>490.191</td><td>2.30299</td></tr><tr><th>3</th><td>m</td><td>lo</td><td>51&lt;70</td><td>57.0477</td><td>-1.12036</td></tr><tr><th>4</th><td>f</td><td>lo</td><td>26&lt;50</td><td>850.882</td><td>2.58526</td></tr><tr><th>5</th><td>m</td><td>no</td><td>26&lt;50</td><td>171.426</td><td>2.54066</td></tr><tr><th>6</th><td>f</td><td>hi</td><td>&gt;70</td><td>201.741</td><td>8.55065</td></tr></tbody></table></div><p>Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.</p><pre><code class="language-julia hljs"># Create a cross-table of background characteristics
+tab = freqtable(df, :sex, :edu, :age)
+
+# Create margins from the population (aggregates obtained from statistical agency)
+pop_margins = ArrayMargins([[0.49, 0.51], [0.05, 0.2, 0.5, 0.25], [0.1, 0.2, 0.4, 0.15, 0.15]])
+
+# Compute array factors
+fac = ipf(Array(tab), pop_margins)
+
+# Compute adjusted table
+tab_adj = Array(fac) .* tab</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×4×5 Named Array{Float64, 3}
+
+[:, :, age=&quot;11&lt;25&quot;] =
+sex ╲ edu │       &quot;hi&quot;        &quot;lo&quot;       &quot;med&quot;        &quot;no&quot;
+──────────┼───────────────────────────────────────────────
+&quot;f&quot;       │ 0.00226476   0.0125168   0.0221265   0.0262771
+&quot;m&quot;       │ 0.00194546  0.00896005   0.0108611   0.0150482
+
+[:, :, age=&quot;26&lt;50&quot;] =
+sex ╲ edu │       &quot;hi&quot;        &quot;lo&quot;       &quot;med&quot;        &quot;no&quot;
+──────────┼───────────────────────────────────────────────
+&quot;f&quot;       │        0.0   0.0244383   0.0462864         0.0
+&quot;m&quot;       │ 0.00854638   0.0209928   0.0556648   0.0440713
+
+[:, :, age=&quot;51&lt;70&quot;] =
+sex ╲ edu │      &quot;hi&quot;       &quot;lo&quot;      &quot;med&quot;       &quot;no&quot;
+──────────┼───────────────────────────────────────────
+&quot;f&quot;       │ 0.0124573  0.0344242   0.086933   0.048179
+&quot;m&quot;       │ 0.0160514  0.0295708  0.0896117  0.0827726
+⋮</code></pre><p>Create weights by looking up the adjusted counts and then performing normalization.</p><pre><code class="language-julia hljs"># Create a poststratification weight variable by lookup from the table
+df.w = [tab_adj[row...] for row in eachrow(df[:, [:sex, :edu, :age]])]
+df.w = df.w ./ sum(df.w) .* N # normalize the weights</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">100-element Vector{Float64}:
+ 1.1556073389818806
+ 0.6028851610942277
+ 0.8057217605868462
+ 0.6658769253217086
+ 1.200819877571924
+ 0.23799660287095142
+ 0.43735668244151815
+ 0.29593433259381396
+ 0.43735668244151815
+ 0.34104803121706323
+ ⋮
+ 0.6028851610942277
+ 0.05300828726323624
+ 0.6028851610942277
+ 0.33942646492302503
+ 1.3127442474308966
+ 0.9169183766055442
+ 2.3686849157862353
+ 0.43676273863855186
+ 0.23286526308411443</code></pre><p>Let&#39;s take a look at how our regression estimates change!</p><pre><code class="language-julia hljs"># perform unweighted regression
+frm = @formula(opn ~ log(inc))
+res = lm(frm, df)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}, Vector{Int64}}}}, Matrix{Float64}}
+
+opn ~ 1 + :(log(inc))
+
+Coefficients:
+────────────────────────────────────────────────────────────────────────
+                 Coef.  Std. Error     t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+────────────────────────────────────────────────────────────────────────
+(Intercept)  2.31943     0.543711   4.27    &lt;1e-04   1.24045    3.3984
+log(inc)     0.0363758   0.0955458  0.38    0.7042  -0.153232   0.225983
+────────────────────────────────────────────────────────────────────────</code></pre><pre><code class="language-julia hljs"># perform weighted regression
+res_w = lm(frm, df, wts = df.w)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}, Vector{Int64}}}}, Matrix{Float64}}
+
+opn ~ 1 + :(log(inc))
+
+Coefficients:
+────────────────────────────────────────────────────────────────────────
+                 Coef.  Std. Error     t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+────────────────────────────────────────────────────────────────────────
+(Intercept)  1.8934      0.558464   3.39    0.0010   0.785143   3.00165
+log(inc)     0.0657046   0.0991532  0.66    0.5091  -0.131062   0.262471
+────────────────────────────────────────────────────────────────────────</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../benchmarks/">Benchmarks »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Wednesday 26 April 2023 11:03">Wednesday 26 April 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
