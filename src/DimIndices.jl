@@ -22,9 +22,12 @@ struct DimIndices
     idx::Vector{Vector{Int}}
     # inner constructor checking uniqueness & completeness
     function DimIndices(idx::Vector{Vector{Int}})
-        # uniqueness
-        if !allunique(vcat(idx...)) 
-            error("Some dimensions were duplicated.")
+        # uniqueness between sets of indices 
+        if !allunique(sort.(idx))
+            error("Some sets of dimensions were duplicated, e.g. [[1,2], [2,1]].")
+        # uniqueness within sets of indices
+        elseif !all(allunique, idx)
+            error("Some dimensions were duplicated within a set, e.g. [[2,1,2], [3]].")
         end
         # completeness
         D = maximum(maximum.(idx))
