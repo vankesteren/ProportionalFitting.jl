@@ -96,13 +96,21 @@ function Base.show(io::IO, AM::ArrayMargins)
         show(io, AM.am[i])
     end
 end
+
 function Base.size(AM::ArrayMargins)
-    sizes = vcat(collect.(size.(AM.am))...)
-    order = sortperm(vcat(AM.di.idx...))
-    return Tuple(sizes[order])
+    dimension_sizes = [Vector{Int}() for i in 1:ndims(AM.di)]
+    for i in 1:length(AM.am)
+        for (j, d) in enumerate(AM.di.idx[i])
+            push!(dimension_sizes[d], size(AM.am[i], j))
+        end
+    end
+    if !all(allequal, dimension_sizes)
+        throw(DimensionMismatch("Dimension sizes not equal"))
+    end
+    return Tuple(first.(dimension_sizes))
 end
 Base.length(AM::ArrayMargins) = length(AM.am)
-Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))
+Base.ndims(AM::ArrayMargins) = ndims(AM.di)
 
 # methods for consistency of margins
 function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))

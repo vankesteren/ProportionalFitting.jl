@@ -82,9 +82,16 @@ function Base.show(io::IO, AF::ArrayFactors)
 end
 
 function Base.size(AF::ArrayFactors)
-    sizes = vcat(collect.(size.(AF.af))...)
-    order = sortperm(vcat(AF.di.idx...))
-    return Tuple(sizes[order])
+    dimension_sizes = [Vector{Int}() for i in 1:ndims(AF.di)]
+    for i in 1:length(AF.af)
+        for (j, d) in enumerate(AF.di.idx[i])
+            push!(dimension_sizes[d], size(AF.af[i], j))
+        end
+    end
+    if !all(allequal, dimension_sizes)
+        throw(DimensionMismatch("Dimension sizes not equal"))
+    end
+    return Tuple(first.(dimension_sizes))
 end
 
 Base.length(AF::ArrayFactors) = length(AF.af)
