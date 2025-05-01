@@ -119,7 +119,7 @@ function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
 end
 
 function proportion_transform(AM::ArrayMargins)
-    mar = convert.(Vector{Float64}, AM.am) ./ sum.(AM.am)
+    mar = convert.(Array{Float64}, AM.am) ./ sum.(AM.am)
     return ArrayMargins(mar, AM.di)
 end
 
