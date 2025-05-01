@@ -148,3 +148,46 @@ end
     AM = ArrayMargins(X_prime, di)
     @test AM.am ≈ m.am
 end
+
+@testset "Multidimensional ipf with repeated dimensions" begin
+    #Simple case
+    X = reshape(repeat(1:6, 4), 2, 3, 4)
+    Y = reshape(repeat(1:4, 6), 2, 3, 4) + X
+    di = DimIndices([[1,3], [2,3]])
+    # Set up multi-margin constraints
+    target_13 = dropdims(sum(Y, dims=2); dims = 2)
+    target_23 = dropdims(sum(Y, dims=1); dims = 1)
+    m = ArrayMargins([target_13, target_23], di)
+    AF = ipf(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime, di)
+    @test AM.am ≈ m.am
+
+    #Larger and more complex case, with unordered dimensions in margin
+    X = reshape(repeat(1:15, 24), 3, 2, 4, 3, 5)
+    Y = reshape(repeat(1:10, 36), 3, 2, 4, 3, 5) + X
+    di = DimIndices([[1,2], [5,3,4], [1,4,3], [2,5]])
+    target_12 = dropdims(sum(Y, dims=(3,4,5)); dims=(3,4,5))
+    target_534 = permutedims(dropdims(sum(Y, dims=(1,2)); dims = (1,2)), (3,1,2))
+    target_143 = permutedims(dropdims(sum(Y, dims=(2,5)); dims = (2,5)), (1,3,2))
+    target_25 = dropdims(sum(Y, dims=(1,3,4)); dims=(1,3,4))
+    m = ArrayMargins([target_12, target_534, target_143, target_25], di)
+    AF = ipf(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime, di)
+    @test AM.am ≈ m.am
+
+    # With multiple complex relationships between overlapping dimensions
+    X = reshape(repeat(1:20, 15), 3, 2, 5, 2, 5)
+    Y = reshape(repeat(1:6, 50), 3, 2, 5, 2, 5) + X
+    di = DimIndices([[5,2,4], [1,4,3], [2,5,1], [4,2]])
+    target_524 = permutedims(dropdims(sum(Y, dims=(1,3)); dims = (1,3)), (3,1,2))
+    target_143 = permutedims(dropdims(sum(Y, dims=(2,5)); dims = (2,5)), (1,3,2))
+    target_251 = permutedims(dropdims(sum(Y, dims=(3,4)); dims = (3,4)), (2,3,1))
+    target_42 = permutedims(dropdims(sum(Y, dims=(1,3,5)); dims = (1,3,5)), (2,1))
+    m = ArrayMargins([target_524, target_143, target_251, target_42], di)
+    AF = ipf(X, m)
+    X_prime = Array(AF) .* X
+    AM = ArrayMargins(X_prime, di)
+    @test AM.am ≈ m.am
+end
