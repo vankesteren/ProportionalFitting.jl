@@ -73,6 +73,7 @@ function ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, t
     di = mar.di
     mar_seed = ArrayMargins(X, di)
     fac = [mar.am[i] ./ mar_seed.am[i] for i in 1:J]
+    n_dims = ndims(mar)
     X_prod = copy(X)
     
     # start iteration
@@ -85,7 +86,7 @@ function ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, t
         for j in 1:J # loop over margin elements
             # get complement dimensions
             notj = setdiff(1:J, j)
-            notd = di[notj]
+            notd = setdiff(1:n_dims, di[j])
 
             # create X multiplied by complement factors
             for k in 1:(J-1) # loop over complement dimensions
@@ -113,7 +114,7 @@ function ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, t
             end
 
             # then we compute the margin by summing over all complement dimensions
-            complement_dims = Tuple(vcat(notd...))
+            complement_dims = Tuple(notd)
             cur_sum = dropdims(sum(X_prod; dims = complement_dims), dims = complement_dims)
             if !issorted(di[j])
                 # reorder if necessary for elementwise division
