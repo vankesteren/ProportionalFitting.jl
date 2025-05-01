@@ -122,3 +122,34 @@ function proportion_transform(AM::ArrayMargins)
     mar = convert.(Vector{Float64}, AM.am) ./ sum.(AM.am)
     return ArrayMargins(mar, AM.di)
 end
+
+function check_margin_totals(AM::ArrayMargins; tol::Float64 = eps(Float64))
+
+    #get all shared subsets of dimensions
+    shared_subsets = vcat(
+        [[i] for i in 1:ndims(AM)], #Single dimensions
+        unique(intersect(AM.di.idx[[i,j]]...) for i in 1:length(AM.di.idx) for j in i+1:length(AM.di.idx)) #Shared subsets
+    )
+
+    #loop over these subsets, and check marginal totals are equal in every array margin where they appear
+    check = true
+    for dd in shared_subsets
+        margin_totals = Vector{Array{Float64}}()
+        for i in 1:length(AM.am)
+            if issubset(dd, AM.di.idx[i])
+                dims_to_sum = findall(x -> !in(x, dd), AM.di.idx[i])
+                margin_total = dropdims(sum(AM.am[i]; dims = dims_to_sum); dims = Tuple(dims_to_sum))
+                #reshape
+                remaining_dims = filter(d -> d in dd, AM.di.idx[i])
+                perm_order = [findfirst(==(d), remaining_dims) for d in dd]
+                push!(margin_totals, permutedims(margin_total, perm_order))
+            end
+        end
+        if !all(x -> isapprox(x, margin_totals[1]; atol = tol), margin_totals)
+            @warn "Margin totals do not match across array margin(s): $dd"
+            check = false
+        end
+    end
+
+    return check
+end

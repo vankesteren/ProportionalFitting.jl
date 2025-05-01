@@ -2,7 +2,7 @@ module ProportionalFitting
 
 export
     DimIndices,
-    ArrayMargins, isconsistent, proportion_transform,
+    ArrayMargins, isconsistent, proportion_transform, check_margin_totals,
     ArrayFactors,
     ipf
 
