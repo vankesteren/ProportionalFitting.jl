@@ -7,11 +7,21 @@ using Test, ProportionalFitting
     @test length(di) == 3
     @test ndims(di) == 6
 
+    # Test with duplicated dimensions
+    di = DimIndices([[5,2,4], [1,4,3], [2,5,1], [4,2]])
+    @test typeof(di) == DimIndices
+    @test length(di) == 4
+    @test ndims(di) == 5
+
     # test completeness
     @test_throws ErrorException DimIndices([2, 1, [5, 4, 6]])
 
     # test uniqueness
     @test_throws ErrorException DimIndices([[2, 3, 2], 1, [5, 4, 6]])
+    @test_throws ErrorException DimIndices([[2, 3], 1, [5, 4, 6], [3,2]])
+    
+    # test subsets allowed
+    @test_nowarn DimIndices([[1, 3], 1, [5, 4, 6], [3,2], [4,5]])
 end
 
 @testset "ArrayMargins" begin
@@ -43,6 +53,43 @@ end
 
     mar5 = ArrayMargins(X, DimIndices([[2, 1]]))
     @test mar5.am[1] == X'
+
+    # Test for overlapping dimension case, as well as Float64 type
+    di = DimIndices([[5,2,4], [1,4,3], [2,5,1], [4,2]])
+    X = convert(Array{Float64}, reshape(repeat(1:20, 15), 3, 2, 5, 2, 5))
+    mar6 = ArrayMargins(X, di)
+    @test typeof(mar6) == ArrayMargins{Float64}
+    @test length(mar6) == 4
+    @test ndims(mar6) == 5
+    @test size(mar6) == (3, 2, 5, 2, 5)
+
+    # Consistency check
+    @test isconsistent(mar6)
+    mar6_p = proportion_transform(mar6)
+    @test sum.(mar6_p.am) ≈ fill(1., 4)
+    @test check_margin_totals(mar6)
+
+    # Check we can catch margin inconsistency
+    mar7 = deepcopy(mar6)
+    mar7.am[2][1,2,4] += 1 #augment one value by one
+    @test !isconsistent(mar7)
+    @test_warn r"Margin totals do not match" check_margin_totals(mar7)
+
+    # Check we can achieve proportion consistency even if margin totals are not consistent
+    mar8 = deepcopy(mar6)
+    mar8.am[1] .*= 2.5 #scale
+    @test !isconsistent(mar8; tol = sqrt(eps(Float64)))
+    @test_warn r"Margin totals do not match" check_margin_totals(mar8)
+    mar8_p = proportion_transform(mar8)
+    @test isconsistent(mar8_p; tol = sqrt(eps(Float64)))
+    @test_nowarn check_margin_totals(mar8_p; tol = sqrt(eps(Float64)))
+
+    # Test we catch mismatched lengths of repeated dimensions
+    target_13 = fill(3, (2,4))
+    target_23 = fill(2, (3,4))
+    di = DimIndices([[1,3], [2,1]]) #incorrect should be [[1,3], [2,3]]
+    m = ArrayMargins([target_13, target_23], di)
+    @test_throws DimensionMismatch size(m)
 end
 
 @testset "ArrayFactors" begin
@@ -80,6 +127,16 @@ end
     di = DimIndices([4, [3, 2], 1, [7, 5, 6]])
     fac7 = ArrayFactors([f3, f2', f1, permutedims(f4, [3, 1, 2])], di)
     @test Array(fac4) ≈ Array(fac7)
+
+    # repeated dimension case
+    di = DimIndices([[1, 2], [4,2,3], [3,1]])
+    f5 = reshape(10:13, 2, 2)
+    # test error
+    fac8 = ArrayFactors([f2, f4, f2'], di)
+    @test_throws DimensionMismatch size(fac8)
+    # test correct version
+    fac9 = ArrayFactors([f2, f4, f5], di)
+    @test size(fac9) == (2,3,2,2)
 end
 
 @testset "Two-dimensional ipf" begin
