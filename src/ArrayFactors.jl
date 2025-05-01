@@ -63,7 +63,7 @@ function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices)
 end
 
 # Constructor promoting vector to dimindices
-ArrayFactors(af::Vector{<:AbstractArray}, di::Vector) = ArrayMargins(af, DimIndices(di))
+ArrayFactors(af::Vector{<:AbstractArray}, di::Vector) = ArrayFactors(af, DimIndices(di))
 
 # Constructor based on factors without dimindices
 ArrayFactors(af::Vector{<:AbstractArray}) = ArrayFactors(af, default_dimindices(af))
