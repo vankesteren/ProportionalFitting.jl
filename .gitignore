@@ -3,3 +3,6 @@
 *.jl.mem
 /docs/build/
 .vscode/
+
+# ignore manifest
+Manifest.toml
