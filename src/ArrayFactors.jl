@@ -89,7 +89,7 @@ function Base.size(AF::ArrayFactors)
         end
     end
     if !all(allequal, dimension_sizes)
-        throw(DimensionMismatch("Dimension sizes not equal"))
+        throw(DimensionMismatch("Overlapping dimensions have differing sizes"))
     end
     return Tuple(first.(dimension_sizes))
 end
