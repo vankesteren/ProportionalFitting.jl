@@ -88,8 +88,7 @@ end
     target_13 = fill(3, (2,4))
     target_23 = fill(2, (3,4))
     di = DimIndices([[1,3], [2,1]]) #incorrect should be [[1,3], [2,3]]
-    m = ArrayMargins([target_13, target_23], di)
-    @test_throws DimensionMismatch size(m)
+    @test_throws DimensionMismatch m = ArrayMargins([target_13, target_23], di)
 end
 
 @testset "ArrayFactors" begin
@@ -132,8 +131,7 @@ end
     di = DimIndices([[1, 2], [4,2,3], [3,1]])
     f5 = reshape(10:13, 2, 2)
     # test error
-    fac8 = ArrayFactors([f2, f4, f2'], di)
-    @test_throws DimensionMismatch size(fac8)
+    @test_throws DimensionMismatch fac8 = ArrayFactors([f2, f4, f2'], di)
     # test correct version
     fac9 = ArrayFactors([f2, f4, f5], di)
     @test size(fac9) == (2,3,2,2)

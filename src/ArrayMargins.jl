@@ -51,6 +51,24 @@ Margins of 3D array:
 struct ArrayMargins{T}
     am::Vector{<:AbstractArray{T}}
     di::DimIndices
+    size::Tuple
+
+    # loop to check dimension sizes
+    function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::DimIndices) where T
+        # loop over arrays then dimensions to get size, checking for mismatches
+        dimension_sizes = zeros(Int, ndims(di))
+        for i in 1:length(am)
+            for (j, d) in enumerate(di.idx[i])
+                new_size = size(am[i], j)
+                if dimension_sizes[d] == 0 
+                    dimension_sizes[d] = new_size
+                else # check
+                    dimension_sizes[d] == new_size || throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
+                end
+            end
+        end
+        return new{T}(am, di, Tuple(dimension_sizes))
+    end
 end
 
 # Constructor for mixed-type arraymargins needs promotion before construction
@@ -97,20 +115,9 @@ function Base.show(io::IO, AM::ArrayMargins)
     end
 end
 
-function Base.size(AM::ArrayMargins)
-    dimension_sizes = [Vector{Int}() for i in 1:ndims(AM.di)]
-    for i in 1:length(AM.am)
-        for (j, d) in enumerate(AM.di.idx[i])
-            push!(dimension_sizes[d], size(AM.am[i], j))
-        end
-    end
-    if !all(allequal, dimension_sizes)
-        throw(DimensionMismatch("Dimension sizes not equal"))
-    end
-    return Tuple(first.(dimension_sizes))
-end
+Base.size(AM::ArrayMargins) = AM.size
 Base.length(AM::ArrayMargins) = length(AM.am)
-Base.ndims(AM::ArrayMargins) = ndims(AM.di)
+Base.ndims(AM::ArrayMargins) = length(AM.size)
 
 # methods for consistency of margins
 function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
@@ -153,3 +160,4 @@ function check_margin_totals(AM::ArrayMargins; tol::Float64 = eps(Float64))
 
     return check
 end
+
