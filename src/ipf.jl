@@ -51,19 +51,19 @@ function ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, t
         throw(DimensionMismatch("The number of margins ($(ndims(mar))) needs to equal ndims(X) = $(ndims(X))."))
     end
     array_size = size(X)
-    if array_size != size(mar) #calling size(mar) implicitly checks dimension sizes between arrays
+    if array_size != size(mar) 
         throw(DimensionMismatch("The size of the margins $(size(mar)) needs to equal size(X) = $array_size."))
     end
 
     # margin consistency checks
-    if (!isconsistent(mar; tol = tol)) || !check_margin_totals(mar; tol = tol)
+    if (!isconsistent(mar; tol = tol)) || !margin_totals_match(mar; tol = tol)
         # transform to proportions
         @info "Inconsistent target margins, converting `X` and `mar` to proportions." 
         X /= sum(X)
         mar = proportion_transform(mar)
 
         #recheck proportions across margins that appear more than once
-        if !check_margin_totals(mar; tol = tol)
+        if !margin_totals_match(mar; tol = tol)
             throw(DimensionMismatch("Margin proportions inconsistent across dimensions"))
         end
     end

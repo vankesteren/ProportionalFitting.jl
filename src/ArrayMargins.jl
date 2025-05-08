@@ -119,6 +119,27 @@ Base.size(AM::ArrayMargins) = AM.size
 Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = length(AM.size)
 
+# method to align all arrays so each has dimindices 1:ndims(AM)
+
+function align_arrays(AM::ArrayMargins{T})::Vector{Array{T}} where T
+
+    aligned_arrays = Vector{Array{T}}()
+    for i in 1:length(AM)
+        cur_idx = AM.di.idx[i]
+        cur_arr = AM.am[i]
+        #sort dimensions if necessary
+        if !issorted(cur_idx)
+            sp = sortperm(cur_idx)
+            cur_idx = cur_idx[sp]
+            cur_arr = permutedims(cur_arr, sp)
+        end
+        # create correct shape for elementwise multiplication
+        shp = ntuple(i -> i ∉ cur_idx ? 1 : size(AM)[i], ndims(AM))
+        push!(aligned_arrays, reshape(cur_arr, shp))
+    end
+    return aligned_arrays
+end
+
 # methods for consistency of margins
 function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
     marsums = sum.(AM.am)
@@ -130,26 +151,23 @@ function proportion_transform(AM::ArrayMargins)
     return ArrayMargins(mar, AM.di)
 end
 
-function check_margin_totals(AM::ArrayMargins; tol::Float64 = eps(Float64))
+function margin_totals_match(AM::ArrayMargins; tol::Float64 = eps(Float64))
 
     #get all shared subsets of dimensions
     shared_subsets = vcat(
         [[i] for i in 1:ndims(AM)], #Single dimensions
-        unique(intersect(AM.di.idx[[i,j]]...) for i in 1:length(AM.di.idx) for j in i+1:length(AM.di.idx)) #Shared subsets
-    )
+        collect(intersect(AM.di.idx[[i,j]]...) for i in 1:length(AM.di.idx) for j in i+1:length(AM.di.idx)) #Shared subsets
+    ) |> unique
 
     #loop over these subsets, and check marginal totals are equal in every array margin where they appear
+    aligned_arrays = align_arrays(AM)
     check = true
     for dd in shared_subsets
         margin_totals = Vector{Array{Float64}}()
         for i in 1:length(AM.am)
             if issubset(dd, AM.di.idx[i])
-                dims_to_sum = findall(x -> !in(x, dd), AM.di.idx[i])
-                margin_total = dropdims(sum(AM.am[i]; dims = dims_to_sum); dims = Tuple(dims_to_sum))
-                #reshape
-                remaining_dims = filter(d -> d in dd, AM.di.idx[i])
-                perm_order = [findfirst(==(d), remaining_dims) for d in dd]
-                push!(margin_totals, permutedims(margin_total, perm_order))
+                complement_dims = setdiff(1:ndims(AM), dd)
+                push!(margin_totals, sum(aligned_arrays[i]; dims = complement_dims))
             end
         end
         if !all(x -> isapprox(x, margin_totals[1]; atol = tol), margin_totals)
@@ -160,4 +178,3 @@ function check_margin_totals(AM::ArrayMargins; tol::Float64 = eps(Float64))
 
     return check
 end
-

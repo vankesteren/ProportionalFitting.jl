@@ -67,22 +67,22 @@ end
     @test isconsistent(mar6)
     mar6_p = proportion_transform(mar6)
     @test sum.(mar6_p.am) ≈ fill(1., 4)
-    @test check_margin_totals(mar6)
+    @test margin_totals_match(mar6)
 
     # Check we can catch margin inconsistency
     mar7 = deepcopy(mar6)
     mar7.am[2][1,2,4] += 1 #augment one value by one
     @test !isconsistent(mar7)
-    @test_warn r"Margin totals do not match" check_margin_totals(mar7)
+    @test_warn r"Margin totals do not match" margin_totals_match(mar7)
 
     # Check we can achieve proportion consistency even if margin totals are not consistent
     mar8 = deepcopy(mar6)
     mar8.am[1] .*= 2.5 #scale
     @test !isconsistent(mar8; tol = sqrt(eps(Float64)))
-    @test_warn r"Margin totals do not match" check_margin_totals(mar8)
+    @test_warn r"Margin totals do not match" margin_totals_match(mar8)
     mar8_p = proportion_transform(mar8)
     @test isconsistent(mar8_p; tol = sqrt(eps(Float64)))
-    @test_nowarn check_margin_totals(mar8_p; tol = sqrt(eps(Float64)))
+    @test_nowarn margin_totals_match(mar8_p; tol = sqrt(eps(Float64)))
 
     # Test we catch mismatched lengths of repeated dimensions
     target_13 = fill(3, (2,4))
