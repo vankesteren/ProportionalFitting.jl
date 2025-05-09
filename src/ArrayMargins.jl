@@ -51,6 +51,27 @@ Margins of 3D array:
 struct ArrayMargins{T}
     am::Vector{<:AbstractArray{T}}
     di::DimIndices
+    size::Tuple
+
+    # loop to check dimension sizes
+    function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::DimIndices) where T
+        # loop over arrays then dimensions to get size, checking for mismatches
+        dimension_sizes = zeros(Int, ndims(di))
+        for i in 1:length(am)
+            for (j, d) in enumerate(di.idx[i])
+                new_size = size(am[i], j)
+                if dimension_sizes[d] == 0 
+                    dimension_sizes[d] = new_size
+                    continue
+                end
+                # check
+                if dimension_sizes[d] != new_size
+                    throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
+                end
+            end
+        end
+        return new{T}(am, di, Tuple(dimension_sizes))
+    end
 end
 
 # Constructor for mixed-type arraymargins needs promotion before construction
@@ -96,13 +117,32 @@ function Base.show(io::IO, AM::ArrayMargins)
         show(io, AM.am[i])
     end
 end
-function Base.size(AM::ArrayMargins)
-    sizes = vcat(collect.(size.(AM.am))...)
-    order = sortperm(vcat(AM.di.idx...))
-    return Tuple(sizes[order])
-end
+
+Base.size(AM::ArrayMargins) = AM.size
 Base.length(AM::ArrayMargins) = length(AM.am)
-Base.ndims(AM::ArrayMargins) = sum(ndims.(AM.am))
+Base.ndims(AM::ArrayMargins) = length(AM.size)
+
+# method to align all arrays so each has dimindices 1:ndims(AM)
+function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
+    
+    aligned_margins = Vector{Array{T}}()
+
+    for i in 1:length(AM)
+        cur_idx = AM.di.idx[i]
+        cur_arr = AM.am[i]
+        # sort dimensions if necessary
+        if !issorted(cur_idx)
+            sp = sortperm(cur_idx)
+            cur_idx = cur_idx[sp]
+            cur_arr = permutedims(cur_arr, sp)
+        end
+        # create correct shape for elementwise operations
+        shp = ntuple(i -> i ∉ cur_idx ? 1 : size(AM)[i], ndims(AM))
+        push!(aligned_margins, reshape(cur_arr, shp))
+    end
+
+    return aligned_margins
+end
 
 # methods for consistency of margins
 function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
@@ -111,6 +151,34 @@ function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
 end
 
 function proportion_transform(AM::ArrayMargins)
-    mar = convert.(Vector{Float64}, AM.am) ./ sum.(AM.am)
+    mar = convert.(Array{Float64}, AM.am) ./ sum.(AM.am)
     return ArrayMargins(mar, AM.di)
+end
+
+function margin_totals_match(AM::ArrayMargins; tol::Float64 = eps(Float64))
+
+    # get all shared subsets of dimensions
+    shared_subsets = vcat(
+        [[i] for i in 1:ndims(AM)], #Single dimensions
+        collect(intersect(AM.di.idx[[i,j]]...) for i in 1:length(AM.di.idx) for j in i+1:length(AM.di.idx)) #Shared subsets
+    ) |> unique
+
+    # loop over these subsets, and check marginal totals are equal in every array margin where they appear
+    aligned_margins = align_margins(AM)
+    check = true
+    for dd in shared_subsets
+        margin_totals = Vector{Array{Float64}}()
+        for i in 1:length(AM.am)
+            if issubset(dd, AM.di.idx[i])
+                complement_dims = setdiff(1:ndims(AM), dd)
+                push!(margin_totals, sum(aligned_margins[i]; dims = complement_dims))
+            end
+        end
+        if !all(x -> isapprox(x, margin_totals[1]; atol = tol), margin_totals)
+            @warn "Margin totals do not match across array margin(s): $dd"
+            check = false
+        end
+    end
+
+    return check
 end
