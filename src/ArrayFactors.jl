@@ -64,8 +64,11 @@ struct ArrayFactors{T}
                 new_size = size(af[i], j)
                 if dimension_sizes[d] == 0 
                     dimension_sizes[d] = new_size
-                else # check
-                    dimension_sizes[d] == new_size || throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
+                    continue
+                end
+                # check
+                if dimension_sizes[d] != new_size
+                    throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
                 end
             end
         end

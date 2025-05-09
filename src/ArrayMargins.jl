@@ -62,8 +62,11 @@ struct ArrayMargins{T}
                 new_size = size(am[i], j)
                 if dimension_sizes[d] == 0 
                     dimension_sizes[d] = new_size
-                else # check
-                    dimension_sizes[d] == new_size || throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
+                    continue
+                end
+                # check
+                if dimension_sizes[d] != new_size
+                    throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
                 end
             end
         end
@@ -120,24 +123,25 @@ Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = length(AM.size)
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
+function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
+    
+    aligned_margins = Vector{Array{T}}()
 
-function align_arrays(AM::ArrayMargins{T})::Vector{Array{T}} where T
-
-    aligned_arrays = Vector{Array{T}}()
     for i in 1:length(AM)
         cur_idx = AM.di.idx[i]
         cur_arr = AM.am[i]
-        #sort dimensions if necessary
+        # sort dimensions if necessary
         if !issorted(cur_idx)
             sp = sortperm(cur_idx)
             cur_idx = cur_idx[sp]
             cur_arr = permutedims(cur_arr, sp)
         end
-        # create correct shape for elementwise multiplication
+        # create correct shape for elementwise operations
         shp = ntuple(i -> i ∉ cur_idx ? 1 : size(AM)[i], ndims(AM))
-        push!(aligned_arrays, reshape(cur_arr, shp))
+        push!(aligned_margins, reshape(cur_arr, shp))
     end
-    return aligned_arrays
+
+    return aligned_margins
 end
 
 # methods for consistency of margins
@@ -160,14 +164,14 @@ function margin_totals_match(AM::ArrayMargins; tol::Float64 = eps(Float64))
     ) |> unique
 
     #loop over these subsets, and check marginal totals are equal in every array margin where they appear
-    aligned_arrays = align_arrays(AM)
+    aligned_margins = align_margins(AM)
     check = true
     for dd in shared_subsets
         margin_totals = Vector{Array{Float64}}()
         for i in 1:length(AM.am)
             if issubset(dd, AM.di.idx[i])
                 complement_dims = setdiff(1:ndims(AM), dd)
-                push!(margin_totals, sum(aligned_arrays[i]; dims = complement_dims))
+                push!(margin_totals, sum(aligned_margins[i]; dims = complement_dims))
             end
         end
         if !all(x -> isapprox(x, margin_totals[1]; atol = tol), margin_totals)
