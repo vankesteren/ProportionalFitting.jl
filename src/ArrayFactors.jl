@@ -71,8 +71,8 @@ struct ArrayFactors{T}
                 end
             end
         end
-        end
         return new{T}(af, di, Tuple(dimension_sizes))
+    end
 end
 
 # Constructor for mixed-type arrayfactors needs promotion before construction
