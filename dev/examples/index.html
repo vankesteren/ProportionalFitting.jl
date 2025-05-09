@@ -14,7 +14,7 @@ df = DataFrame(
 df.opn = 1.5 .+ log.(df.inc) .* .1 + rand(p_opn, N)
 
 # show the first 6 rows
-first(df, 6)</code></pre><div><div style = "float: left;"><span>6×5 DataFrame</span></div><div style = "clear: both;"></div></div><div class = "data-frame" style = "overflow-x: scroll;"><table class = "data-frame" style = "margin-bottom: 6px;"><thead><tr class = "header"><th class = "rowNumber" style = "font-weight: bold; text-align: right;">Row</th><th style = "text-align: left;">sex</th><th style = "text-align: left;">edu</th><th style = "text-align: left;">age</th><th style = "text-align: left;">inc</th><th style = "text-align: left;">opn</th></tr><tr class = "subheader headerLastRow"><th class = "rowNumber" style = "font-weight: bold; text-align: right;"></th><th title = "CategoricalArrays.CategoricalValue{String, UInt32}" style = "text-align: left;">Cat…</th><th title = "CategoricalArrays.CategoricalValue{String, UInt32}" style = "text-align: left;">Cat…</th><th title = "CategoricalArrays.CategoricalValue{String, UInt32}" style = "text-align: left;">Cat…</th><th title = "Float64" style = "text-align: left;">Float64</th><th title = "Float64" style = "text-align: left;">Float64</th></tr></thead><tbody><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">1</td><td style = "text-align: left;">m</td><td style = "text-align: left;">lo</td><td style = "text-align: left;">&gt;70</td><td style = "text-align: right;">11275.2</td><td style = "text-align: right;">4.22356</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">2</td><td style = "text-align: left;">m</td><td style = "text-align: left;">hi</td><td style = "text-align: left;">&gt;70</td><td style = "text-align: right;">3.86262</td><td style = "text-align: right;">6.09897</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">3</td><td style = "text-align: left;">f</td><td style = "text-align: left;">med</td><td style = "text-align: left;">&lt;10</td><td style = "text-align: right;">323.388</td><td style = "text-align: right;">1.37334</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">4</td><td style = "text-align: left;">m</td><td style = "text-align: left;">lo</td><td style = "text-align: left;">&lt;10</td><td style = "text-align: right;">18.5644</td><td style = "text-align: right;">5.11953</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">5</td><td style = "text-align: left;">f</td><td style = "text-align: left;">no</td><td style = "text-align: left;">26&lt;50</td><td style = "text-align: right;">11.0046</td><td style = "text-align: right;">1.45017</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">6</td><td style = "text-align: left;">f</td><td style = "text-align: left;">med</td><td style = "text-align: left;">&lt;10</td><td style = "text-align: right;">60.7274</td><td style = "text-align: right;">4.78955</td></tr></tbody></table></div><p>Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.</p><pre><code class="language-julia hljs"># Create a cross-table of background characteristics
+first(df, 6)</code></pre><div><div style = "float: left;"><span>6×5 DataFrame</span></div><div style = "clear: both;"></div></div><div class = "data-frame" style = "overflow-x: scroll;"><table class = "data-frame" style = "margin-bottom: 6px;"><thead><tr class = "header"><th class = "rowNumber" style = "font-weight: bold; text-align: right;">Row</th><th style = "text-align: left;">sex</th><th style = "text-align: left;">edu</th><th style = "text-align: left;">age</th><th style = "text-align: left;">inc</th><th style = "text-align: left;">opn</th></tr><tr class = "subheader headerLastRow"><th class = "rowNumber" style = "font-weight: bold; text-align: right;"></th><th title = "CategoricalArrays.CategoricalValue{String, UInt32}" style = "text-align: left;">Cat…</th><th title = "CategoricalArrays.CategoricalValue{String, UInt32}" style = "text-align: left;">Cat…</th><th title = "CategoricalArrays.CategoricalValue{String, UInt32}" style = "text-align: left;">Cat…</th><th title = "Float64" style = "text-align: left;">Float64</th><th title = "Float64" style = "text-align: left;">Float64</th></tr></thead><tbody><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">1</td><td style = "text-align: left;">m</td><td style = "text-align: left;">med</td><td style = "text-align: left;">&gt;70</td><td style = "text-align: right;">3692.75</td><td style = "text-align: right;">-2.11764</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">2</td><td style = "text-align: left;">m</td><td style = "text-align: left;">med</td><td style = "text-align: left;">11&lt;25</td><td style = "text-align: right;">3.20713</td><td style = "text-align: right;">9.81234</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">3</td><td style = "text-align: left;">f</td><td style = "text-align: left;">med</td><td style = "text-align: left;">&lt;10</td><td style = "text-align: right;">35448.4</td><td style = "text-align: right;">2.31274</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">4</td><td style = "text-align: left;">m</td><td style = "text-align: left;">hi</td><td style = "text-align: left;">26&lt;50</td><td style = "text-align: right;">83.6476</td><td style = "text-align: right;">0.827256</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">5</td><td style = "text-align: left;">f</td><td style = "text-align: left;">med</td><td style = "text-align: left;">26&lt;50</td><td style = "text-align: right;">3038.26</td><td style = "text-align: right;">-2.00744</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">6</td><td style = "text-align: left;">f</td><td style = "text-align: left;">lo</td><td style = "text-align: left;">11&lt;25</td><td style = "text-align: right;">20.4893</td><td style = "text-align: right;">3.63211</td></tr></tbody></table></div><p>Then, we create post-stratification weights based on population-level margins using the background characteristics through ProportionalFitting.</p><pre><code class="language-julia hljs"># Create a cross-table of background characteristics
 tab = freqtable(df, :sex, :edu, :age)
 
 # Create margins from the population (aggregates obtained from statistical agency)
@@ -27,57 +27,57 @@ fac = ipf(Array(tab), pop_margins)
 tab_adj = Array(fac) .* tab</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×4×5 Named Array{Float64, 3}
 
 [:, :, age=11&lt;25] =
-sex ╲ edu │         hi          lo         med          no
-──────────┼───────────────────────────────────────────────
-f         │ 0.00243691   0.0094717   0.0375435         0.0
-m         │ 0.00136482   0.0176825   0.0210267    0.010474
+sex ╲ edu │          hi           lo          med           no
+──────────┼───────────────────────────────────────────────────
+f         │ 0.000862716    0.0110354    0.0176286   0.00997059
+m         │  0.00336008    0.0179086     0.039234          0.0
 
 [:, :, age=26&lt;50] =
 sex ╲ edu │         hi          lo         med          no
 ──────────┼───────────────────────────────────────────────
-f         │ 0.00711161  0.00460687   0.0273907   0.0545764
-m         │ 0.00398294   0.0258013    0.030681   0.0458492
+f         │ 0.00317734   0.0135477   0.0309168   0.0489616
+m         │  0.0103125  0.00879418   0.0842899         0.0
 
 [:, :, age=51&lt;70] =
 sex ╲ edu │         hi          lo         med          no
 ──────────┼───────────────────────────────────────────────
-f         │ 0.00795412   0.0618317   0.0612713    0.061042
-m         │  0.0133644   0.0230864    0.137263   0.0341873
+f         │ 0.00777203   0.0441849      0.0605         0.0
+m         │  0.0100901   0.0430225    0.117817    0.116613
 ⋮</code></pre><p>Create weights by looking up the adjusted counts and then performing normalization.</p><pre><code class="language-julia hljs"># Create a poststratification weight variable by lookup from the table
 df.w = [tab_adj[row...] for row in eachrow(df[:, [:sex, :edu, :age]])]
 df.w = df.w ./ sum(df.w) .* N # normalize the weights</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">100-element Vector{Float64}:
- 0.8609427550370984
- 0.33225890267023694
- 1.7521724167795707
- 0.18862849174503835
- 1.3154309819513024
- 1.7521724167795707
- 0.3221161199154351
- 0.1714080676331597
- 0.5067963585234012
- 0.058735744035682616
+ 0.8665434664542032
+ 1.104055815104764
+ 2.4536729674910744
+ 0.29019730575328706
+ 0.8700082208965645
+ 0.31054029941973244
+ 0.5039520127749886
+ 0.09455371367613546
+ 0.2839382895848565
+ 0.5039520127749886
  ⋮
- 1.1424725727476306
- 1.4767954719877625
- 0.1714080676331597
- 0.5067963585234012
- 1.4903016233941901
- 0.058735744035682616
- 1.7521724167795707
- 3.308386784183899
- 1.7521724167795707</code></pre><p>Let&#39;s take a look at how our regression estimates change!</p><pre><code class="language-julia hljs"># perform unweighted regression
+ 1.104055815104764
+ 1.104055815104764
+ 0.8700082208965645
+ 0.889954667347303
+ 1.243374840060706
+ 0.6499590904767596
+ 0.5039520127749886
+ 0.38123498153905044
+ 0.496074176160095</code></pre><p>Let&#39;s take a look at how our regression estimates change!</p><pre><code class="language-julia hljs"># perform unweighted regression
 frm = @formula(opn ~ log(inc))
 res = lm(frm, df)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}, Vector{Int64}}}}, Matrix{Float64}}
 
 opn ~ 1 + :(log(inc))
 
 Coefficients:
-────────────────────────────────────────────────────────────────────────
-                Coef.  Std. Error     t  Pr(&gt;|t|)   Lower 95%  Upper 95%
-────────────────────────────────────────────────────────────────────────
-(Intercept)  2.03245     0.672264  3.02    0.0032   0.698368    3.36654
-log(inc)     0.118435    0.109347  1.08    0.2814  -0.0985617   0.335431
-────────────────────────────────────────────────────────────────────────</code></pre><pre><code class="language-julia hljs"># perform weighted regression
+───────────────────────────────────────────────────────────────────────
+                Coef.  Std. Error     t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+───────────────────────────────────────────────────────────────────────
+(Intercept)  1.91       0.600418   3.18    0.0020   0.718491   3.10151
+log(inc)     0.056188   0.0969749  0.58    0.5636  -0.136256   0.248632
+───────────────────────────────────────────────────────────────────────</code></pre><pre><code class="language-julia hljs"># perform weighted regression
 res_w = lm(frm, df, wts = df.w)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}, Vector{Int64}}}}, Matrix{Float64}}
 
 opn ~ 1 + :(log(inc))
@@ -86,6 +86,6 @@ Coefficients:
 ────────────────────────────────────────────────────────────────────────
                  Coef.  Std. Error     t  Pr(&gt;|t|)  Lower 95%  Upper 95%
 ────────────────────────────────────────────────────────────────────────
-(Intercept)  1.98937      0.728483  2.73    0.0075   0.543718   3.43502
-log(inc)     0.0360293    0.123286  0.29    0.7707  -0.208627   0.280686
-────────────────────────────────────────────────────────────────────────</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../benchmarks/">Benchmarks »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.2 on <span class="colophon-date" title="Tuesday 6 May 2025 12:30">Tuesday 6 May 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+(Intercept)  2.08281     0.536809   3.88    0.0002   1.01753    3.14809
+log(inc)     0.0290461   0.0833467  0.35    0.7282  -0.136353   0.194445
+────────────────────────────────────────────────────────────────────────</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../benchmarks/">Benchmarks »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.2 on <span class="colophon-date" title="Friday 9 May 2025 18:31">Friday 9 May 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
