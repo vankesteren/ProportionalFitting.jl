@@ -157,13 +157,13 @@ end
 
 function margin_totals_match(AM::ArrayMargins; tol::Float64 = eps(Float64))
 
-    #get all shared subsets of dimensions
+    # get all shared subsets of dimensions
     shared_subsets = vcat(
         [[i] for i in 1:ndims(AM)], #Single dimensions
         collect(intersect(AM.di.idx[[i,j]]...) for i in 1:length(AM.di.idx) for j in i+1:length(AM.di.idx)) #Shared subsets
     ) |> unique
 
-    #loop over these subsets, and check marginal totals are equal in every array margin where they appear
+    # loop over these subsets, and check marginal totals are equal in every array margin where they appear
     aligned_margins = align_margins(AM)
     check = true
     for dd in shared_subsets

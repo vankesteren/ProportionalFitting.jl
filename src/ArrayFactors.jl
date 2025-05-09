@@ -55,9 +55,8 @@ struct ArrayFactors{T}
     di::DimIndices
     size::Tuple
 
-    #loop to check dimension sizes
     function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where T
-        #loop over arrays then dimensions to get size, checking for mismatches
+        # loop over arrays then dimensions to get size, checking for mismatches
         dimension_sizes = zeros(Int, ndims(di))
         for i in 1:length(af)
             for (j, d) in enumerate(di.idx[i])
@@ -72,8 +71,8 @@ struct ArrayFactors{T}
                 end
             end
         end
+        end
         return new{T}(af, di, Tuple(dimension_sizes))
-    end
 end
 
 # Constructor for mixed-type arrayfactors needs promotion before construction
