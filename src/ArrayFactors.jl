@@ -55,19 +55,23 @@ struct ArrayFactors{T}
     di::DimIndices
     size::Tuple
 
-    function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where T
+    function ArrayFactors(af::Vector{<:AbstractArray{T}}, di::DimIndices) where {T}
         # loop over arrays then dimensions to get size, checking for mismatches
         dimension_sizes = zeros(Int, ndims(di))
         for i in 1:length(af)
             for (j, d) in enumerate(di.idx[i])
                 new_size = size(af[i], j)
-                if dimension_sizes[d] == 0 
+                if dimension_sizes[d] == 0
                     dimension_sizes[d] = new_size
                     continue
                 end
                 # check
                 if dimension_sizes[d] != new_size
-                    throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
+                    throw(
+                        DimensionMismatch(
+                            "Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size",
+                        ),
+                    )
                 end
             end
         end
@@ -79,7 +83,7 @@ end
 function ArrayFactors(af::Vector{<:AbstractArray}, di::DimIndices)
     AT = eltype(af)
     PT = promote_type(eltype.(af)...)
-    ArrayFactors(Vector{AT{PT}}(af), di)
+    return ArrayFactors(Vector{AT{PT}}(af), di)
 end
 
 # Constructor promoting vector to dimindices

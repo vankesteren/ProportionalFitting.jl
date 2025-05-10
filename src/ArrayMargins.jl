@@ -54,19 +54,23 @@ struct ArrayMargins{T}
     size::Tuple
 
     # loop to check dimension sizes
-    function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::DimIndices) where T
+    function ArrayMargins(am::Vector{<:AbstractArray{T}}, di::DimIndices) where {T}
         # loop over arrays then dimensions to get size, checking for mismatches
         dimension_sizes = zeros(Int, ndims(di))
         for i in 1:length(am)
             for (j, d) in enumerate(di.idx[i])
                 new_size = size(am[i], j)
-                if dimension_sizes[d] == 0 
+                if dimension_sizes[d] == 0
                     dimension_sizes[d] = new_size
                     continue
                 end
                 # check
                 if dimension_sizes[d] != new_size
-                    throw(DimensionMismatch("Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size"))
+                    throw(
+                        DimensionMismatch(
+                            "Dimension sizes not equal for dimension $d: $(dimension_sizes[d]) and $new_size",
+                        ),
+                    )
                 end
             end
         end
@@ -78,7 +82,7 @@ end
 function ArrayMargins(am::Vector{<:AbstractArray}, di::DimIndices)
     AT = eltype(am)
     PT = promote_type(eltype.(am)...)
-    ArrayMargins(Vector{AT{PT}}(am), di)
+    return ArrayMargins(Vector{AT{PT}}(am), di)
 end
 
 # Constructor promoting vector to dimindices
@@ -91,14 +95,16 @@ ArrayMargins(am::Vector{<:AbstractArray}) = ArrayMargins(am, default_dimindices(
 function ArrayMargins(X::AbstractArray, di::DimIndices)
     D = ndims(X)
     if D != ndims(di)
-        throw(DimensionMismatch("Dimensions of X ($(ndims(X))) mismatch DI ($(ndims(di)))."))
+        throw(
+            DimensionMismatch("Dimensions of X ($(ndims(X))) mismatch DI ($(ndims(di))).")
+        )
     end
 
     # create the margins
     am = Vector{AbstractArray{eltype(X)}}()
     for dim in di.idx
         notd = Tuple(setdiff(1:D, dim))
-        mar = dropdims(sum(X; dims = notd); dims = notd)
+        mar = dropdims(sum(X; dims=notd); dims=notd)
         if !issorted(dim)
             mar = permutedims(mar, sortperm(sortperm(dim)))
         end
@@ -123,8 +129,7 @@ Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = length(AM.size)
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
-function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
-    
+function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where {T}
     aligned_margins = Vector{Array{T}}()
 
     for i in 1:length(AM)
@@ -145,7 +150,7 @@ function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
 end
 
 # methods for consistency of margins
-function isconsistent(AM::ArrayMargins; tol::Float64 = eps(Float64))
+function isconsistent(AM::ArrayMargins; tol::Float64=eps(Float64))
     marsums = sum.(AM.am)
     return (maximum(marsums) - minimum(marsums)) < tol
 end
@@ -155,13 +160,16 @@ function proportion_transform(AM::ArrayMargins)
     return ArrayMargins(mar, AM.di)
 end
 
-function margin_totals_match(AM::ArrayMargins; tol::Float64 = eps(Float64))
+function margin_totals_match(AM::ArrayMargins; tol::Float64=eps(Float64))
 
     # get all shared subsets of dimensions
-    shared_subsets = vcat(
+    shared_subsets = unique(vcat(
         [[i] for i in 1:ndims(AM)], #Single dimensions
-        collect(intersect(AM.di.idx[[i,j]]...) for i in 1:length(AM.di.idx) for j in i+1:length(AM.di.idx)) #Shared subsets
-    ) |> unique
+        collect(
+            intersect(AM.di.idx[[i, j]]...) for i in 1:length(AM.di.idx) for
+            j in (i + 1):length(AM.di.idx)
+        ), #Shared subsets
+    ))
 
     # loop over these subsets, and check marginal totals are equal in every array margin where they appear
     aligned_margins = align_margins(AM)
@@ -171,10 +179,10 @@ function margin_totals_match(AM::ArrayMargins; tol::Float64 = eps(Float64))
         for i in 1:length(AM.am)
             if issubset(dd, AM.di.idx[i])
                 complement_dims = setdiff(1:ndims(AM), dd)
-                push!(margin_totals, sum(aligned_margins[i]; dims = complement_dims))
+                push!(margin_totals, sum(aligned_margins[i]; dims=complement_dims))
             end
         end
-        if !all(x -> isapprox(x, margin_totals[1]; atol = tol), margin_totals)
+        if !all(x -> isapprox(x, margin_totals[1]; atol=tol), margin_totals)
             @warn "Margin totals do not match across array margin(s): $dd"
             check = false
         end

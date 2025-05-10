@@ -3,6 +3,7 @@
 [![CI](https://github.com/vankesteren/ProportionalFitting.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/vankesteren/ProportionalFitting.jl/actions/workflows/CI.yml) 
 [![devdoc](https://img.shields.io/badge/docs-dev-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/dev)
 [![stabledoc](https://img.shields.io/badge/docs-stable-blue.svg)](https://vankesteren.github.io/ProportionalFitting.jl/stable)
+[![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/JuliaDiff/BlueStyle)
 
 Multidimensional iterative proportional fitting in Julia. 
 
