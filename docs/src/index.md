@@ -116,3 +116,38 @@ We then also use `ArrayMargins` to check whether the margins of this array are i
 ```@example ex
 ArrayMargins(Z, dimid)
 ```
+
+## Repeated margins
+
+With multidimensional margins, it is also possible to enter a single margin multiple times in different target margins. This is allowed as long as the margin totals match, and as long as no two target margins are about the exact same dimensions. For example:
+
+```@example ex
+# Create a 2×3×4 array with seed value 1
+initial_array = ones(2, 3, 4)
+
+# Specify target margins for dimensions 1 and 3
+tgt_13 = [
+    10.0 15.0 20.0 25.0;
+    30.0 35.0 40.0 45.0
+]
+
+# Specify target margins for dimensions 2 and 3
+tgt_23 = [
+    12.0 16.0 20.0 24.0;
+    18.0 22.0 26.0 30.0;
+    10.0 12.0 14.0 16.0
+]
+
+# dimension 3 occurs twice!
+target_dims = [[1, 3], [2, 3]]
+target_margins = [tgt_13, tgt_23]
+
+# at this point, the margins are checked for consistency
+AM = ArrayMargins(target_margins, target_dims)
+
+# We can run ipf with these duplicated margins
+AF = ipf(initial_array, AM)
+
+# check that the margins are as specified
+ArrayMargins(Array(AF), target_dims)
+```

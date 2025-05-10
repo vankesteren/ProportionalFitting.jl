@@ -25,14 +25,14 @@ struct DimIndices
         # uniqueness between sets of indices 
         if !allunique(sort.(idx))
             error("Some sets of dimensions were duplicated, e.g. [[1,2], [2,1]].")
-        # uniqueness within sets of indices
+            # uniqueness within sets of indices
         elseif !all(allunique, idx)
             error("Some dimensions were duplicated within a set, e.g. [[2,1,2], [3]].")
         end
         # completeness
         D = maximum(maximum.(idx))
         dmissing = setdiff(1:D, vcat(idx...))
-        if length(dmissing) > 0 
+        if length(dmissing) > 0
             error("Missing array dimensions: $dmissing.")
         end
         return new(idx)
@@ -40,9 +40,9 @@ struct DimIndices
 end
 
 # convenient constructor
-DimIndices(X::Vector) = DimIndices(Vector{Union{Int, Vector{Int}}}(X))
-function DimIndices(X::Vector{Union{Int, Vector{Int}}})
-    DimIndices(broadcast((x) -> [x...], X))
+DimIndices(X::Vector) = DimIndices(Vector{Union{Int,Vector{Int}}}(X))
+function DimIndices(X::Vector{Union{Int,Vector{Int}}})
+    return DimIndices(broadcast((x) -> [x...], X))
 end
 
 """
@@ -74,7 +74,7 @@ function default_dimindices(m::Vector{<:AbstractArray})
     j = 0
     dd = []
     for i in nd
-        push!(dd, collect((j+1):(j+i)))
+        push!(dd, collect((j + 1):(j + i)))
         j += i
     end
     return DimIndices(dd)
@@ -90,7 +90,9 @@ function Base.show(io::IO, DI::DimIndices)
     print("[")
     for i in 1:length(DI)
         show(io, DI.idx[i])
-        if i != length(DI) print(", ") end
+        if i != length(DI)
+            print(", ")
+        end
     end
-    print("]")
+    return print("]")
 end
