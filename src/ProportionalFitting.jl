@@ -9,7 +9,6 @@ export
 include("DimIndices.jl")
 include("ArrayMargins.jl")
 include("ArrayFactors.jl")
-include("utils.jl")
 include("ipf.jl")
 
 end # module
