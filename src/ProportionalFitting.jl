@@ -7,6 +7,7 @@ export DimIndices,
     align_arrays,
     margin_totals_match,
     ArrayFactors,
+    adjust!,
     ipf
 
 include("DimIndices.jl")
