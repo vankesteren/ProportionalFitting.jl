@@ -10,9 +10,11 @@ The array factors can be vectors or multidimensional arrays themselves.
 
 The main use of ArrayFactors is as a memory-efficient representation of a
 multidimensional array, which can be constructed using the `Array()`
-method.
+method. However, to perform elementwise multiplication of this array with
+another array `X` of the same size, it is more efficient not instantiate
+the full array. Instead, call `adjust!(X, AF)`.
 
-see also: [`ipf`](@ref), [`ArrayMargins`](@ref), [`DimIndices`](@ref)
+see also: [`ipf`](@ref), [`ArrayMargins`](@ref), [`DimIndices`](@ref), [`adjust!`](@ref)
 
 # Fields
 - `af::Vector{<:AbstractArray}`: Vector of (multidimensional) array factors
@@ -107,6 +109,84 @@ end
 
 Base.size(AF::ArrayFactors) = AF.size
 Base.length(AF::ArrayFactors) = length(AF.af)
+Base.ndims(AF::ArrayFactors) = length(AF.size)
+
+"""
+    adjust!(X::AbstractArray{T}, AF::ArrayFactors{U})
+
+Adjust a seed array with respect to a set of ArrayFactors. The adjustment
+happens through elementwise multiplication of the array by each factor,
+taking into account the dimensions that this factor belongs to. This
+performs the same operation as `X .* Array(AF)`, but faster and more
+memory-efficient.
+
+# Arguments
+- `X::AbstractArray`: Seed array to be adjusted
+- `AF::ArrayFactors`: Array factors
+
+# Type constraints:
+- `T == U` where both are subtypes of `Number`
+- `T <: AbstractFloat` and `U <: Number`
+- `T <: Integer` and `U <: Integer`
+
+# Examples
+```julia-repl
+julia> AF = ArrayFactors([[1, 2, 3, 4], [.1, .2, .3, .4]])
+Factors for 2D array:
+  [1]: [1.0, 2.0, 3.0, 4.0]
+  [2]: [0.1, 0.2, 0.3, 0.4]
+
+julia> X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
+4×4 Matrix{Int64}:
+ 40  30   20   10
+ 35  50  100   75
+ 30  80   70  120
+ 20  30   40   50
+
+julia> adjust!(X, AF)
+julia> X
+4×4 Matrix{Int64}:
+ 4   6   6    4
+ 7  20  60   60
+ 9  48  63  144
+ 8  24  48   80
+```
+"""
+function adjust!(X::AbstractArray{T}, AF::ArrayFactors{T}) where {T<:Number}
+    return _adjust!(X, AF)
+end
+
+function adjust!(
+    X::AbstractArray{T}, AF::ArrayFactors{U}
+) where {T<:AbstractFloat,U<:Number}
+    return _adjust!(X, AF)
+end
+
+function adjust!(X::AbstractArray{T}, AF::ArrayFactors{U}) where {T<:Integer,U<:Integer}
+    return _adjust!(X, AF)
+end
+
+function _adjust!(X::AbstractArray, AF::ArrayFactors)
+    # check dimensions
+    D = length(AF)
+    asize = size(AF)
+    if size(X) ≠ asize
+        throw(DimensionMismatch("X is incompatible with array factors"))
+    end
+
+    # perform elementwise multiplication for each factor
+    for d in 1:D
+        idx = AF.di.idx[d]
+        af = AF.af[d]
+        if !issorted(idx)
+            sp = sortperm(idx)
+            idx = idx[sp]
+            af = permutedims(af, sp)
+        end
+        shp = ntuple(i -> i ∉ idx ? 1 : asize[i], ndims(AF))
+        X .*= reshape(af, shp)
+    end
+end
 
 """
     Array(AF::ArrayFactors{T})
@@ -114,17 +194,17 @@ Base.length(AF::ArrayFactors) = length(AF.af)
 Create an array out of an ArrayFactors object.
 
 # Arguments
-- `A::ArrayFactors{T}`: Array factors
+- `AF::ArrayFactors{T}`: Array factors
 
 # Examples
 ```julia-repl
-julia> fac = ArrayFactors([[1,2,3], [4,5], [6,7]])
+julia> AF = ArrayFactors([[1,2,3], [4,5], [6,7]])
 Factors for array of size (3, 2, 2):
     1: [1, 2, 3]
     2: [4, 5]
     3: [6, 7]
 
-julia> Array(fac)
+julia> Array(AF)
 3×2×2 Array{Int64, 3}:
 [:, :, 1] =
  24  30
@@ -138,20 +218,7 @@ julia> Array(fac)
 ```
 """
 function Base.Array(AF::ArrayFactors{T}) where {T}
-    D = length(AF.di)
-    asize = size(AF)
-    M = ones(T, asize)
-    for d in 1:D
-        idx = AF.di.idx[d]
-        af = AF.af[d]
-        if !issorted(idx)
-            sp = sortperm(idx)
-            idx = idx[sp]
-            af = permutedims(af, sp)
-        end
-        dims = [idx...]
-        shp = ntuple(i -> i ∉ dims ? 1 : asize[popfirst!(dims)], ndims(AF.di))
-        M .*= reshape(af, shp)
-    end
-    return M
+    X = ones(T, size(AF))
+    adjust!(X, AF)
+    return X
 end
