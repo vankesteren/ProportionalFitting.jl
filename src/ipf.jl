@@ -56,11 +56,10 @@ function ipf(
             ),
         )
     end
-    array_size = size(X)
-    if array_size != size(mar)
+    if size(X) != size(mar)
         throw(
             DimensionMismatch(
-                "The size of the margins $(size(mar)) needs to equal size(X) = $array_size."
+                "The size of the margins $(size(mar)) needs to equal size(X) = $(size(X))."
             ),
         )
     end
@@ -78,20 +77,27 @@ function ipf(
         end
     end
 
-    # initialization (simplified first iteration)
+    # initialization 
+
+    # define dimensions
     J = length(mar)
     di = mar.di
-    mar_seed = ArrayMargins(X, di)
+    complement_dims = Tuple.(setdiff(1:ndims(mar), dd) for dd in di.idx)
 
     # pre-align array margins
     aligned_margins = align_margins(mar)
-    aligned_seed = align_margins(mar_seed)
+
+    # initialize seed as aligned array margins
+    aligned_seed = align_margins(ArrayMargins(X, di))
+
+    # initialize factors to update
     fac = [aligned_margins[i] ./ aligned_seed[i] for i in 1:J]
 
-    n_dims = ndims(mar)
+    # copy the starting array
     X_prod = copy(X)
 
     # start iteration
+
     iter = 0
     crit = 0.0
     for i in 1:maxiter
@@ -99,16 +105,11 @@ function ipf(
         oldfac = deepcopy(fac)
 
         for j in 1:J # loop over margin elements
-            # get complement dimensions
-            notj = setdiff(1:J, j)
-            notd = setdiff(1:n_dims, di[j])
+            notj = setdiff(1:J, j) # get complement margins
 
             # create X multiplied by complement factors
-            for k in 1:(J - 1) # loop over complement dimensions
-                # get current dimindex & current factor
-                cur_idx = di[notj[k]]
-                cur_fac = fac[notj[k]]
-
+            for k in 1:J-1 # loop over complement margins
+                cur_fac = fac[notj[k]] # get current factor
                 # perform elementwise multiplication
                 if k == 1
                     X_prod = X .* cur_fac
@@ -118,8 +119,7 @@ function ipf(
             end
 
             # then we compute the margin by summing over all complement dimensions
-            complement_dims = Tuple(notd)
-            cur_sum = sum(X_prod; dims=complement_dims)
+            cur_sum = sum(X_prod; dims=complement_dims[j])
 
             # update this factor
             fac[j] = aligned_margins[j] ./ cur_sum
@@ -139,15 +139,13 @@ function ipf(
     end
 
     # return factors to original margin shape
-    original_shape_factors = map(1:J) do j
-        relevant_dims = di[j]
-        complement_dims = setdiff(1:ndims(mar), relevant_dims)
-        fac_orig_shp = dropdims(fac[j]; dims = Tuple(complement_dims))
-        sp = sortperm(sortperm(relevant_dims))
-        permutedims(fac_orig_shp, sp)
+    reshaped_factors = map(1:J) do j
+        reshaped_fac = dropdims(fac[j]; dims=complement_dims[j])
+        sp = sortperm(sortperm(di[j]))
+        permutedims(reshaped_fac, sp)
     end
 
-    return ArrayFactors(original_shape_factors, di)
+    return ArrayFactors(reshaped_factors, di)
 end
 
 function ipf(
