@@ -82,7 +82,12 @@ function ipf(
     J = length(mar)
     di = mar.di
     mar_seed = ArrayMargins(X, di)
-    fac = [mar.am[i] ./ mar_seed.am[i] for i in 1:J]
+
+    # pre-align array margins
+    aligned_margins = align_margins(mar)
+    aligned_seed = align_margins(mar_seed)
+    fac = [aligned_margins[i] ./ aligned_seed[i] for i in 1:J]
+
     n_dims = ndims(mar)
     X_prod = copy(X)
 
@@ -104,35 +109,20 @@ function ipf(
                 cur_idx = di[notj[k]]
                 cur_fac = fac[notj[k]]
 
-                # reorder if necessary for elementwise multiplication
-                if !issorted(cur_idx)
-                    sp = sortperm(cur_idx)
-                    cur_idx = cur_idx[sp]
-                    cur_fac = permutedims(cur_fac, sp)
-                end
-
-                # create correct shape for elementwise multiplication
-                dims = copy(cur_idx)
-                shp = ntuple(i -> i ∉ dims ? 1 : array_size[popfirst!(dims)], ndims(di))
-
                 # perform elementwise multiplication
                 if k == 1
-                    X_prod = X .* reshape(cur_fac, shp)
+                    X_prod = X .* cur_fac
                 else
-                    X_prod .*= reshape(cur_fac, shp)
+                    X_prod .*= cur_fac
                 end
             end
 
             # then we compute the margin by summing over all complement dimensions
             complement_dims = Tuple(notd)
-            cur_sum = dropdims(sum(X_prod; dims=complement_dims); dims=complement_dims)
-            if !issorted(di[j])
-                # reorder if necessary for elementwise division
-                cur_sum = permutedims(cur_sum, sortperm(sortperm(di[j])))
-            end
+            cur_sum = sum(X_prod; dims=complement_dims)
 
             # update this factor
-            fac[j] = mar.am[j] ./ cur_sum
+            fac[j] = aligned_margins[j] ./ cur_sum
         end
 
         # convergence check
@@ -148,7 +138,16 @@ function ipf(
         @info "Converged in $iter iterations."
     end
 
-    return ArrayFactors(fac, di)
+    # return factors to original margin shape
+    original_shape_factors = map(1:J) do j
+        relevant_dims = di[j]
+        complement_dims = setdiff(1:ndims(mar), relevant_dims)
+        fac_orig_shp = dropdims(fac[j]; dims = Tuple(complement_dims))
+        sp = sortperm(sortperm(relevant_dims))
+        permutedims(fac_orig_shp, sp)
+    end
+
+    return ArrayFactors(original_shape_factors, di)
 end
 
 function ipf(
