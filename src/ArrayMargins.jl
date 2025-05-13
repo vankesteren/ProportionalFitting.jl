@@ -129,24 +129,8 @@ Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = length(AM.size)
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
-function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where {T}
-    aligned_margins = Vector{Array{T}}()
-
-    for i in 1:length(AM)
-        cur_idx = AM.di.idx[i]
-        cur_arr = AM.am[i]
-        # sort dimensions if necessary
-        if !issorted(cur_idx)
-            sp = sortperm(cur_idx)
-            cur_idx = cur_idx[sp]
-            cur_arr = permutedims(cur_arr, sp)
-        end
-        # create correct shape for elementwise operations
-        shp = ntuple(i -> i ∉ cur_idx ? 1 : size(AM)[i], ndims(AM))
-        push!(aligned_margins, reshape(cur_arr, shp))
-    end
-
-    return aligned_margins
+function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
+    align_margins(AM.am, AM.di, AM.size)
 end
 
 # methods for consistency of margins
