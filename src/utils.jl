@@ -6,7 +6,7 @@ Base.Dict(AF::ArrayFactors) = Dict(AF.di[i] => AF.af[i] for i in 1:length(AF))
 function align_margins(arr::AbstractArray, idx::Vector{Int}, shape::Tuple)
     # sort dimensions if necessary
     sp = sortperm(idx)
-    permuted_arr = permutedims(arr, sp)
+    permuted_arr = PermutedDimsArray(arr, sp) # use a view unlike permutedims()
     # create correct shape for elementwise operations
     shp = ntuple(i -> i ∉ idx ? 1 : shape[i], length(shape))
     return reshape(permuted_arr, shp)
