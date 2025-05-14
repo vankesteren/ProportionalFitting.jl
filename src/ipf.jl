@@ -141,8 +141,12 @@ function ipf(
     # return factors to original margin shape
     reshaped_factors = map(1:J) do j
         reshaped_fac = dropdims(fac[j]; dims=complement_dims[j])
-        sp = sortperm(sortperm(di[j]))
-        permutedims(reshaped_fac, sp)
+        if !issorted(di[j])
+            sp = sortperm(sortperm(di[j]))
+            permutedims(reshaped_fac, sp)
+        else
+            reshaped_fac
+        end
     end
 
     return ArrayFactors(reshaped_factors, di)
