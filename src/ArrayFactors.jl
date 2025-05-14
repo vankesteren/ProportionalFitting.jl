@@ -108,6 +108,11 @@ end
 Base.size(AF::ArrayFactors) = AF.size
 Base.length(AF::ArrayFactors) = length(AF.af)
 
+# method to align all arrays so each has dimindices 1:ndims(AM)
+function align_margins(AF::ArrayFactors{T})::Vector{Array{T}} where T
+    align_margins(AF.af, AF.di, AF.size)
+end
+
 """
     Array(AF::ArrayFactors{T})
 
@@ -139,19 +144,10 @@ julia> Array(fac)
 """
 function Base.Array(AF::ArrayFactors{T}) where {T}
     D = length(AF.di)
-    asize = size(AF)
-    M = ones(T, asize)
+    M = ones(T, size(AF))
+    aligned_factors = align_margins(AF)
     for d in 1:D
-        idx = AF.di.idx[d]
-        af = AF.af[d]
-        if !issorted(idx)
-            sp = sortperm(idx)
-            idx = idx[sp]
-            af = permutedims(af, sp)
-        end
-        dims = [idx...]
-        shp = ntuple(i -> i ∉ dims ? 1 : asize[popfirst!(dims)], ndims(AF.di))
-        M .*= reshape(af, shp)
+        M .*= aligned_factors[d]
     end
     return M
 end
