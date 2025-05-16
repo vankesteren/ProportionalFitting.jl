@@ -139,7 +139,7 @@ function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
 end
 
 # methods for consistency of margins
-function isconsistent(AM::ArrayMargins; tol = √eps(Float64))
+function isconsistent(AM::ArrayMargins; tol = 1e-10)
     marsums = sum.(AM.am)
     return (maximum(marsums) - minimum(marsums)) < tol
 end
@@ -149,7 +149,7 @@ function proportion_transform(AM::ArrayMargins)
     return ArrayMargins(mar, AM.di)
 end
 
-function margin_totals_match(AM::ArrayMargins; tol = √eps(Float64))
+function margin_totals_match(AM::ArrayMargins; tol = 1e-10)
 
     # get all shared subsets of dimensions
     shared_subsets = unique(vcat(

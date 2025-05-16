@@ -26,7 +26,7 @@ see also: [`ArrayFactors`](@ref), [`ArrayMargins`](@ref)
 - `maxiter::Int=1000`: Maximum number of iterations
 - `precision::DataType=Float64`: The numeric precision to which calculations are
     carried out. Note that there is no bounds checking, however. Must be <:AbstractFloat.
-- `tol=√eps(precision)`: Factor change tolerance for convergence
+- `tol=1e-10`: Factor change tolerance for convergence
 
 # Examples
 ```julia-repl
@@ -52,16 +52,16 @@ Margins of 2D array:
 ```
 """
 function ipf(
-    X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int=1000, precision::DataType=Float64, tol=√eps(Float64)
+    X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int=1000, precision::DataType=Float64, tol=1e-10
 )
     # convert to specified precision
     if !(precision <: AbstractFloat)
         throw(ArgumentError("Argument `precision` must be a subtype of AbstractFloat, such as Float64."))
     end
 
-    tol = √eps(precision)
-    mar_p = typeof(mar) === ArrayMargins{precision} ? mar : convert(precision, mar)
     X_p = eltype(X) === precision ? X : convert(Array{precision}, X)
+    mar_p = typeof(mar) === ArrayMargins{precision} ? mar : convert(precision, mar)
+    tol_p = max(convert(precision, tol), eps(precision))
 
     # dimension check
     if ndims(X_p) != ndims(mar_p)
@@ -80,14 +80,14 @@ function ipf(
     end
 
     # margin consistency checks
-    if !isconsistent(mar_p; tol=tol) || !margin_totals_match(mar_p; tol=tol)
+    if !isconsistent(mar_p; tol=tol_p) || !margin_totals_match(mar_p; tol=tol_p)
         # transform to proportions
         @info "Inconsistent target margins, converting `X` and `mar` to proportions."
         X_p /= sum(X_p)
         mar_p = proportion_transform(mar_p)
 
         #recheck proportions across margins that appear more than once
-        if !margin_totals_match(mar_p; tol=tol)
+        if !margin_totals_match(mar_p; tol=tol_p)
             throw(DimensionMismatch("Margin proportions inconsistent across dimensions"))
         end
     end
@@ -142,7 +142,7 @@ function ipf(
 
         # convergence check
         crit = maximum(broadcast(x -> maximum(abs.(x)), fac - oldfac))
-        if crit < tol
+        if crit < tol_p
             break
         end
     end
@@ -171,15 +171,15 @@ function ipf(
     X::AbstractArray{<:Real},
     mar::Vector{<:Vector{<:Real}};
     maxiter::Int=1000,
-    tol::Float64=1e-10,
+    tol=1e-10,
 )
     return ipf(X, ArrayMargins(mar); maxiter=maxiter, tol=tol)
 end
 
-function ipf(mar::ArrayMargins{T}; maxiter::Int=1000, tol::Float64=1e-10) where {T}
+function ipf(mar::ArrayMargins{T}; maxiter::Int=1000, tol=1e-10) where {T}
     return ipf(ones(T, size(mar)), mar; maxiter=maxiter, tol=tol)
 end
 
-function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int=1000, tol::Float64=1e-10)
+function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int=1000, tol=1e-10)
     return ipf(ArrayMargins(mar); maxiter=maxiter, tol=tol)
 end
