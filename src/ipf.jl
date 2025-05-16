@@ -46,33 +46,42 @@ Margins of 2D array:
 ```
 """
 function ipf(
-    X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int=1000, tol::Float64=1e-10
+    X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int=1000, precision::DataType=Float64, tol=√eps(Float64)
 )
+    # convert to specified precision
+    if !(precision <: AbstractFloat)
+        throw(ArgumentError("Argument `precision` must be a subtype of AbstractFloat such as Float64"))
+    end
+
+    tol = √eps(precision)
+    mar_p = typeof(mar) === ArrayMargins{precision} ? mar : convert(precision, mar)
+    X_p = eltype(X) === precision ? X : convert(Array{precision}, X)
+
     # dimension check
-    if ndims(X) != ndims(mar)
+    if ndims(X_p) != ndims(mar_p)
         throw(
             DimensionMismatch(
-                "The number of margins ($(ndims(mar))) needs to equal ndims(X) = $(ndims(X)).",
+                "The number of margins ($(ndims(mar_p))) needs to equal ndims(X) = $(ndims(X_p)).",
             ),
         )
     end
-    if size(X) != size(mar)
+    if size(X_p) != size(mar_p)
         throw(
             DimensionMismatch(
-                "The size of the margins $(size(mar)) needs to equal size(X) = $(size(X))."
+                "The size of the margins $(size(mar_p)) needs to equal size(X) = $(size(X_p))."
             ),
         )
     end
 
     # margin consistency checks
-    if !isconsistent(mar; tol=tol) || !margin_totals_match(mar; tol=tol)
+    if !isconsistent(mar_p; tol=tol) || !margin_totals_match(mar_p; tol=tol)
         # transform to proportions
         @info "Inconsistent target margins, converting `X` and `mar` to proportions."
-        X /= sum(X)
-        mar = proportion_transform(mar)
+        X_p /= sum(X_p)
+        mar_p = proportion_transform(mar_p)
 
         #recheck proportions across margins that appear more than once
-        if !margin_totals_match(mar; tol=tol)
+        if !margin_totals_match(mar_p; tol=tol)
             throw(DimensionMismatch("Margin proportions inconsistent across dimensions"))
         end
     end
@@ -80,21 +89,21 @@ function ipf(
     # initialization 
 
     # define dimensions
-    J = length(mar)
-    di = mar.di
-    complement_dims = Tuple.(setdiff(1:ndims(mar), dd) for dd in di.idx)
+    J = length(mar_p)
+    di = mar_p.di
+    complement_dims = Tuple.(setdiff(1:ndims(mar_p), dd) for dd in di.idx)
 
     # pre-align array margins
-    aligned_margins = align_margins(mar)
+    aligned_margins = align_margins(mar_p)
 
     # initialize seed as aligned array margins
-    aligned_seed = align_margins(ArrayMargins(X, di))
+    aligned_seed = align_margins(ArrayMargins(X_p, di))
 
     # initialize factors to update
     fac = [aligned_margins[i] ./ aligned_seed[i] for i in 1:J]
 
     # copy the starting array
-    X_prod = copy(X)
+    X_prod = copy(X_p)
 
     # start iteration
 
@@ -112,7 +121,7 @@ function ipf(
                 cur_fac = fac[notj[k]] # get current factor
                 # perform elementwise multiplication
                 if k == 1
-                    X_prod = X .* cur_fac
+                    X_prod = X_p .* cur_fac
                 else
                     X_prod .*= cur_fac
                 end
