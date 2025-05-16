@@ -91,6 +91,9 @@ end
     target_23 = fill(2, (3, 4))
     di = DimIndices([[1, 3], [2, 1]]) #incorrect should be [[1,3], [2,3]]
     @test_throws DimensionMismatch m = ArrayMargins([target_13, target_23], di)
+
+    # Test conversion method
+    @test all(x -> eltype(x) === Float32, convert(Float32, mar6).am)
 end
 
 @testset "ArrayFactors" begin
@@ -169,6 +172,19 @@ end
     X_prime = Array(AF) .* X
     AM = ArrayMargins(X_prime)
     @test AM.am ≈ m.am
+
+    # Test we can set precision returns
+    AF_32 = ipf(X, m; precision=Float32)
+    @test all(x -> eltype(x) === Float32, AF_32.af)
+
+    # Test converting to precision does not error
+    X_32 = convert.(Float32, X)
+    m_32 = convert(Float32, m)
+    AF_64 = ipf(X_32, m_32; precision=Float64)
+    @test all(x -> eltype(x) === Float64, AF_64.af)
+
+    # Test the argument error
+    @test_throws ArgumentError ipf(X, m; precision=Int64)
 end
 
 @testset "Multidimensional ipf" begin
