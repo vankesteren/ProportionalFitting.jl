@@ -121,7 +121,7 @@ function ipf(
                 cur_fac = fac[notj[k]] # get current factor
                 # perform elementwise multiplication
                 if k == 1
-                    X_prod = X_p .* cur_fac
+                    X_prod .= X_p .* cur_fac
                 else
                     X_prod .*= cur_fac
                 end
