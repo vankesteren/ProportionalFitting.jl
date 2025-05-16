@@ -6,7 +6,7 @@
 
 Perform iterative proportional fitting (factor method). The array (X) can be
 any number of dimensions, and the margins can be multidimensional as well. 
-If only the margins are given, then the seed matrix `X` is assumed
+If only the margins are given, then the seed array `X` is assumed
 to be an array filled with ones of the correct size and element type.
 
 If the margins are not an ArrayMargins object, they will be coerced to this type.
@@ -14,13 +14,19 @@ If the margins are not an ArrayMargins object, they will be coerced to this type
 This function returns the update matrix as an ArrayFactors object. To compute
 the updated matrix, use `Array(result) .* X` (see examples).
 
+If decreasing memory usage is a concern, it is possible to set `precision` to be lower
+    than Float64. It is also possible to decrease memory usage (by up to almost 50%) by
+    supplying `X` as an an object of type `Array{precision}`.
+
 see also: [`ArrayFactors`](@ref), [`ArrayMargins`](@ref)
 
 # Arguments
 - `X::AbstractArray{<:Real}`: Array to be adjusted
 - `mar::ArrayMargins`: Target margins as an ArrayMargins object
 - `maxiter::Int=1000`: Maximum number of iterations
-- `tol::Float64=1e-10`: Factor change tolerance for convergence
+- `precision::DataType=Float64`: The numeric precision to which calculations are
+    carried out. Note that there is no bounds checking, however. Must be <:AbstractFloat.
+- `tol=√eps(precision)`: Factor change tolerance for convergence
 
 # Examples
 ```julia-repl
@@ -50,7 +56,7 @@ function ipf(
 )
     # convert to specified precision
     if !(precision <: AbstractFloat)
-        throw(ArgumentError("Argument `precision` must be a subtype of AbstractFloat such as Float64"))
+        throw(ArgumentError("Argument `precision` must be a subtype of AbstractFloat, such as Float64."))
     end
 
     tol = √eps(precision)
