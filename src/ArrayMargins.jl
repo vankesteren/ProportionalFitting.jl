@@ -128,23 +128,28 @@ Base.size(AM::ArrayMargins) = AM.size
 Base.length(AM::ArrayMargins) = length(AM.am)
 Base.ndims(AM::ArrayMargins) = length(AM.size)
 
+function Base.convert(T::DataType, AM::ArrayMargins)::ArrayMargins{T}
+    new_margins = [convert.(T, arr) for arr in AM.am]
+    return ArrayMargins(new_margins, AM.di)
+end
+
 # method to align all arrays so each has dimindices 1:ndims(AM)
 function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
     align_margins(AM.am, AM.di, AM.size)
 end
 
 # methods for consistency of margins
-function isconsistent(AM::ArrayMargins; tol::Float64=eps(Float64))
+function isconsistent(AM::ArrayMargins; tol = 1e-10)
     marsums = sum.(AM.am)
     return (maximum(marsums) - minimum(marsums)) < tol
 end
 
 function proportion_transform(AM::ArrayMargins)
-    mar = convert.(Array{Float64}, AM.am) ./ sum.(AM.am)
+    mar = AM.am ./ sum.(AM.am)
     return ArrayMargins(mar, AM.di)
 end
 
-function margin_totals_match(AM::ArrayMargins; tol::Float64=eps(Float64))
+function margin_totals_match(AM::ArrayMargins; tol = 1e-10)
 
     # get all shared subsets of dimensions
     shared_subsets = unique(vcat(
@@ -159,7 +164,7 @@ function margin_totals_match(AM::ArrayMargins; tol::Float64=eps(Float64))
     aligned_margins = align_margins(AM)
     check = true
     for dd in shared_subsets
-        margin_totals = Vector{Array{Float64}}()
+        margin_totals = Vector{Array}()
         for i in 1:length(AM.am)
             if issubset(dd, AM.di.idx[i])
                 complement_dims = setdiff(1:ndims(AM), dd)
