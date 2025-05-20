@@ -1,5 +1,5 @@
 """
-    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::AbstractFloat = 1e-10; force_consistency::Bool=true)
+    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::AbstractFloat = 1e-10; force_consistency::Bool=false)
     ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}})
     ipf(mar::ArrayMargins)
     ipf(mar::Vector{<:Vector{<:Real}})
