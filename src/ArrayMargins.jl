@@ -190,7 +190,8 @@ end
 
 # method to force (aligned) margins to be consistent
 function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
-    am_new = deepcopy(am)
+
+    new_am = deepcopy(am)
 
     # get all shared subsets of dimensions
     shared_subsets = shared_dimension_subsets(di)
