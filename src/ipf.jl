@@ -52,11 +52,21 @@ Margins of 2D array:
 ```
 """
 function ipf(
-    X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int=1000, precision::DataType=Float64, tol=1e-10
+    X::AbstractArray{<:Real},
+    mar::ArrayMargins;
+    maxiter::Int=1000,
+    precision::DataType=Float64,
+    tol::AbstractFloat=1e-10,
+    force_consistency::Bool=false,
 )
+
     # convert to specified precision
     if !(precision <: AbstractFloat)
-        throw(ArgumentError("Argument `precision` must be a subtype of AbstractFloat, such as Float64."))
+        throw(
+            ArgumentError(
+                "Argument `precision` must be a subtype of AbstractFloat, such as Float64."
+            ),
+        )
     end
 
     X_p = eltype(X) === precision ? X : convert(Array{precision}, X)
@@ -74,33 +84,42 @@ function ipf(
     if size(X_p) != size(mar_p)
         throw(
             DimensionMismatch(
-                "The size of the margins $(size(mar_p)) needs to equal size(X) = $(size(X_p))."
+                "The size of the margins $(size(mar_p)) needs to equal size(X) = $(size(X_p)).",
             ),
         )
     end
 
-    # margin consistency checks
-    if !isconsistent(mar_p; tol=tol_p) || !margin_totals_match(mar_p; tol=tol_p)
-        # transform to proportions
-        @info "Inconsistent target margins, converting `X` and `mar` to proportions."
-        X_p /= sum(X_p)
-        mar_p = proportion_transform(mar_p)
+    # pre-align array margins
+    aligned_margins = align_margins(mar_p)
+    di = mar_p.di
 
-        #recheck proportions across margins that appear more than once
-        if !margin_totals_match(mar_p; tol=tol_p)
-            throw(DimensionMismatch("Margin proportions inconsistent across dimensions"))
+    # margin consistency checks
+    if !isconsistent(aligned_margins; tol=tol_p)
+        # transform to proportions
+        @info "Inconsistent target margin totals, converting `X` and `mar` to proportions."
+        X_p /= sum(X_p)
+        aligned_margins = proportion_transform(aligned_margins)
+    end
+
+    # check proportions across margins that appear more than once
+    if !margin_totals_match(aligned_margins, di; tol=tol_p)
+        if force_consistency
+            @warn "Margin proportions inconsistent across repeated dimensions. Forcing margin consistency."
+            aligned_margins = make_margins_consistent(aligned_margins, di)
+        else
+            throw(
+                DimensionMismatch(
+                    "Margin proportions inconsistent across repeated dimensions."
+                ),
+            )
         end
     end
 
     # initialization 
 
     # define dimensions
-    J = length(mar_p)
-    di = mar_p.di
-    complement_dims = Tuple.(setdiff(1:ndims(mar_p), dd) for dd in di.idx)
-
-    # pre-align array margins
-    aligned_margins = align_margins(mar_p)
+    J = length(di)
+    complement_dims = Tuple.(setdiff(1:ndims(di), dd) for dd in di.idx)
 
     # initialize seed as aligned array margins
     aligned_seed = align_margins(ArrayMargins(X_p, di))
@@ -123,7 +142,7 @@ function ipf(
             notj = setdiff(1:J, j) # get complement margins
 
             # create X multiplied by complement factors
-            for k in 1:J-1 # loop over complement margins
+            for k in 1:(J - 1) # loop over complement margins
                 cur_fac = fac[notj[k]] # get current factor
                 # perform elementwise multiplication
                 if k == 1
