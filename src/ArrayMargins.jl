@@ -205,6 +205,7 @@ function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
             end
         end
         # calculate average
+        println(margin_totals)
         mean_margin_total = reduce(+, margin_totals) ./ length(margin_totals)
         # modify copy
         for i in 1:length(am)

@@ -121,7 +121,7 @@ function ipf(
         else
             throw(
                 DimensionMismatch(
-                    "Margin totals inconsistent across repeated dimensions."
+                    "Margin totals inconsistent across repeated dimensions. Pass force_consistency=true to converge to the mean."
                 ),
             )
         end
