@@ -15,3 +15,14 @@ function align_margins(A::Vector{<:AbstractArray}, DI::DimIndices, shape::Tuple)
         align_margins(arr, idx, shape)
     end
 end
+
+# get all shared subsets of dimensions
+function shared_dimension_subsets(DI::DimIndices)
+    single_dimensions = [[i] for i in 1:ndims(DI)]
+    shared_subsets = collect(
+        intersect(DI.idx[[i, j]]...)
+        for i in 1:length(DI)
+        for j in (i + 1):length(DI)
+    )
+    return unique(vcat(single_dimensions, shared_subsets))
+end

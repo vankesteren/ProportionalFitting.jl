@@ -134,41 +134,44 @@ function Base.convert(T::DataType, AM::ArrayMargins)::ArrayMargins{T}
 end
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
-function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
-    align_margins(AM.am, AM.di, AM.size)
+function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where {T}
+    return align_margins(AM.am, AM.di, AM.size)
 end
 
-# methods for consistency of margins
-function isconsistent(AM::ArrayMargins; tol = 1e-10)
-    marsums = sum.(AM.am)
+# method for consistency of margin totals
+function isconsistent(am::Vector{<:AbstractArray}; tol::AbstractFloat=1e-10)
+    marsums = sum.(am)
     return (maximum(marsums) - minimum(marsums)) < tol
 end
 
-function proportion_transform(AM::ArrayMargins)
-    mar = AM.am ./ sum.(AM.am)
-    return ArrayMargins(mar, AM.di)
+isconsistent(AM::ArrayMargins; tol::AbstractFloat=1e-10) = isconsistent(AM.am; tol=tol)
+
+# method for transforming aligned margins to proportions
+function proportion_transform(am::Vector{<:AbstractArray})
+    return am ./ sum.(am)
 end
 
-function margin_totals_match(AM::ArrayMargins; tol = 1e-10)
+# method for transforming ArrayMargins 
+function proportion_transform(AM::ArrayMargins)
+    return ArrayMargins(proportion_transform(AM.am), AM.di)
+end
+
+# method to check totals across repeated dimensions 
+function margin_totals_match(
+    am::Vector{<:AbstractArray}, di::DimIndices; tol::AbstractFloat=1e-10
+)
 
     # get all shared subsets of dimensions
-    shared_subsets = unique(vcat(
-        [[i] for i in 1:ndims(AM)], #Single dimensions
-        collect(
-            intersect(AM.di.idx[[i, j]]...) for i in 1:length(AM.di.idx) for
-            j in (i + 1):length(AM.di.idx)
-        ), #Shared subsets
-    ))
+    shared_subsets = shared_dimension_subsets(di)
 
     # loop over these subsets, and check marginal totals are equal in every array margin where they appear
-    aligned_margins = align_margins(AM)
     check = true
     for dd in shared_subsets
         margin_totals = Vector{Array}()
-        for i in 1:length(AM.am)
-            if issubset(dd, AM.di.idx[i])
-                complement_dims = setdiff(1:ndims(AM), dd)
-                push!(margin_totals, sum(aligned_margins[i]; dims=complement_dims))
+        for i in 1:length(am)
+            if issubset(dd, di.idx[i])
+                complement_dims = setdiff(1:ndims(di), dd)
+                push!(margin_totals, sum(am[i]; dims=complement_dims))
             end
         end
         if !all(x -> isapprox(x, margin_totals[1]; atol=tol), margin_totals)
@@ -178,4 +181,40 @@ function margin_totals_match(AM::ArrayMargins; tol = 1e-10)
     end
 
     return check
+end
+
+# method to check totals for ArrayMargins directly
+function margin_totals_match(AM::ArrayMargins; tol::AbstractFloat=1e-10)
+    return margin_totals_match(align_margins(AM), AM.di; tol=tol)
+end
+
+# method to force (aligned) margins to be consistent
+function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
+
+    new_am = deepcopy(am)
+
+    # get all shared subsets of dimensions
+    shared_subsets = shared_dimension_subsets(di)
+
+    # loop over these subsets, and check marginal totals are equal in every array margin where they appear
+    for dd in shared_subsets
+        margin_totals = Vector{Array}()
+        complement_dims = setdiff(1:ndims(di), dd)
+        # calculate margin totals
+        for i in 1:length(am)
+            if issubset(dd, di.idx[i])
+                push!(margin_totals, sum(am[i]; dims=complement_dims))
+            end
+        end
+        # calculate average
+        mean_margin_total = reduce(+, margin_totals) ./ length(margin_totals)
+        # modify copy
+        for i in 1:length(am)
+            if issubset(dd, di.idx[i])
+                new_am[i] = new_am[i] ./ sum(new_am[i]; dims=complement_dims) .* mean_margin_total
+            end
+        end
+    end
+
+    return new_am
 end
