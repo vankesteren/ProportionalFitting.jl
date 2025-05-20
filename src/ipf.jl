@@ -141,7 +141,7 @@ function ipf(
         end
 
         # convergence check
-        crit = maximum(broadcast(x -> maximum(abs.(x)), fac - oldfac))
+        crit = @inbounds maximum(maximum(abs.(fac[i] .- oldfac[i])) for i in eachindex(fac))
         if crit < tol_p
             break
         end
