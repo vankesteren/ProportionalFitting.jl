@@ -186,3 +186,33 @@ function margin_totals_match(AM::ArrayMargins; tol = 1e-10)
     return margin_totals_match(align_margins(AM), AM.di; tol=tol)
 end
 
+# method to force (aligned) margins to be consistent
+function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
+
+    new_am = deepcopy(am)
+
+    # get all shared subsets of dimensions
+    shared_subsets = shared_dimension_subsets(di)
+
+    # loop over these subsets, and check marginal totals are equal in every array margin where they appear
+    for dd in shared_subsets
+        margin_totals = Vector{Array}()
+        complement_dims = setdiff(1:ndims(di), dd)
+        # calculate margin totals
+        for i in 1:length(am)
+            if issubset(dd, di.idx[i])
+                push!(margin_totals, sum(am[i]; dims=complement_dims))
+            end
+        end
+        # calculate average
+        mean_margin_total = reduce(+, margin_totals) ./ length(margin_totals)
+        # modify copy
+        for i in 1:length(am)
+            if issubset(dd, di.idx[i])
+                new_am[i] = new_am[i] ./ sum(new_am[i]; dims=complement_dims) .* mean_margin_total
+            end
+        end
+    end
+
+    return new_am
+end
