@@ -1,5 +1,5 @@
 """
-    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10; force_consistency::Bool=true)
+    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::AbstractFloat = 1e-10; force_consistency::Bool=true)
     ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}})
     ipf(mar::ArrayMargins)
     ipf(mar::Vector{<:Vector{<:Real}})
@@ -64,13 +64,13 @@ Margins of 2D array:
 ```
 """
 function ipf(
-    X::AbstractArray{<:Real},
-    mar::ArrayMargins;
-    maxiter::Int=1000,
-    precision::DataType=Float64,
-    tol::AbstractFloat=1e-10,
-    force_consistency::Bool=false,
-)
+        X::AbstractArray{<:Real},
+        mar::ArrayMargins;
+        maxiter::Int=1000,
+        precision::DataType=Float64,
+        tol::AbstractFloat=1e-10,
+        force_consistency::Bool=false
+    )
 
     # convert to specified precision
     if !(precision <: AbstractFloat)
@@ -202,15 +202,15 @@ function ipf(
     X::AbstractArray{<:Real},
     mar::Vector{<:Vector{<:Real}};
     maxiter::Int=1000,
-    tol=1e-10,
+    tol::AbstractFloat=1e-10,
 )
     return ipf(X, ArrayMargins(mar); maxiter=maxiter, tol=tol)
 end
 
-function ipf(mar::ArrayMargins{T}; maxiter::Int=1000, tol=1e-10) where {T}
+function ipf(mar::ArrayMargins{T}; maxiter::Int=1000, tol::AbstractFloat=1e-10) where {T}
     return ipf(ones(T, size(mar)), mar; maxiter=maxiter, tol=tol)
 end
 
-function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int=1000, tol=1e-10)
+function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int=1000, tol::AbstractFloat=1e-10)
     return ipf(ArrayMargins(mar); maxiter=maxiter, tol=tol)
 end

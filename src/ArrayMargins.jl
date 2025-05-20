@@ -134,17 +134,17 @@ function Base.convert(T::DataType, AM::ArrayMargins)::ArrayMargins{T}
 end
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
-function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where T
-    align_margins(AM.am, AM.di, AM.size)
+function align_margins(AM::ArrayMargins{T})::Vector{Array{T}} where {T}
+    return align_margins(AM.am, AM.di, AM.size)
 end
 
 # method for consistency of margin totals
-function isconsistent(am::Vector{<:AbstractArray}; tol = 1e-10)
+function isconsistent(am::Vector{<:AbstractArray}; tol::AbstractFloat=1e-10)
     marsums = sum.(am)
     return (maximum(marsums) - minimum(marsums)) < tol
 end
 
-isconsistent(AM::ArrayMargins; tol = 1e-10) = isconsistent(AM.am; tol=tol)
+isconsistent(AM::ArrayMargins; tol::AbstractFloat=1e-10) = isconsistent(AM.am; tol=tol)
 
 # method for transforming aligned margins to proportions
 function proportion_transform(am::Vector{<:AbstractArray})
@@ -157,7 +157,9 @@ function proportion_transform(AM::ArrayMargins)
 end
 
 # method to check totals across repeated dimensions 
-function margin_totals_match(am::Vector{<:AbstractArray}, di::DimIndices; tol = 1e-10)
+function margin_totals_match(
+    am::Vector{<:AbstractArray}, di::DimIndices; tol::AbstractFloat=1e-10
+)
 
     # get all shared subsets of dimensions
     shared_subsets = shared_dimension_subsets(di)
@@ -182,14 +184,13 @@ function margin_totals_match(am::Vector{<:AbstractArray}, di::DimIndices; tol = 
 end
 
 # method to check totals for ArrayMargins directly
-function margin_totals_match(AM::ArrayMargins; tol = 1e-10)
+function margin_totals_match(AM::ArrayMargins; tol::AbstractFloat=1e-10)
     return margin_totals_match(align_margins(AM), AM.di; tol=tol)
 end
 
 # method to force (aligned) margins to be consistent
 function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
-
-    new_am = deepcopy(am)
+    am_new = deepcopy(am)
 
     # get all shared subsets of dimensions
     shared_subsets = shared_dimension_subsets(di)
@@ -205,7 +206,6 @@ function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
             end
         end
         # calculate average
-        println(margin_totals)
         mean_margin_total = reduce(+, margin_totals) ./ length(margin_totals)
         # modify copy
         for i in 1:length(am)
