@@ -1,5 +1,5 @@
 """
-    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
+    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10; force_consistency::Bool=true)
     ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}})
     ipf(mar::ArrayMargins)
     ipf(mar::Vector{<:Vector{<:Real}})
@@ -14,6 +14,15 @@ If the margins are not an ArrayMargins object, they will be coerced to this type
 This function returns the update matrix as an ArrayFactors object. To compute
 the updated matrix, use `Array(result) .* X` (see examples).
 
+If the margin arrays do not have the same total, the input array and margins will
+    be converted to proportions. In this case, the updated matrix should be accessed
+    with `Array(result) .* (X / sum(X))`.
+
+If dimensions repeated across the margin arrays do not have identical totals, an error is
+    thrown by default. Passing `force_consistency=true` will run ipf to converge on the
+    mean of the inconsistent margins. Note that this will lead to outputs that
+    will not match the specified margins.
+
 If decreasing memory usage is a concern, it is possible to set `precision` to be lower
     than Float64. It is also possible to decrease memory usage (by up to almost 50%) by
     supplying `X` as an an object of type `Array{precision}`.
@@ -26,7 +35,10 @@ see also: [`ArrayFactors`](@ref), [`ArrayMargins`](@ref)
 - `maxiter::Int=1000`: Maximum number of iterations
 - `precision::DataType=Float64`: The numeric precision to which calculations are
     carried out. Note that there is no bounds checking, however. Must be <:AbstractFloat.
-- `tol=1e-10`: Factor change tolerance for convergence
+- `tol::AbstractFloat=1e-10`: Factor change tolerance for convergence
+- `force_consistency::Bool=false`: If dimensions repeated across margin arrays have
+    inconsistent totals, converge to the mean (true) or throw an error (false)?
+
 
 # Examples
 ```julia-repl
@@ -96,7 +108,7 @@ function ipf(
     # margin consistency checks
     if !isconsistent(aligned_margins; tol=tol_p)
         # transform to proportions
-        @info "Inconsistent target margin totals, converting `X` and `mar` to proportions."
+        @info "Inconsistent margin totals, converting `X` and `mar` to proportions."
         X_p /= sum(X_p)
         aligned_margins = proportion_transform(aligned_margins)
     end
@@ -104,12 +116,12 @@ function ipf(
     # check proportions across margins that appear more than once
     if !margin_totals_match(aligned_margins, di; tol=tol_p)
         if force_consistency
-            @warn "Margin proportions inconsistent across repeated dimensions. Forcing margin consistency."
+            @warn "Margin totals inconsistent across repeated dimensions. Forcing margin consistency."
             aligned_margins = make_margins_consistent(aligned_margins, di)
         else
             throw(
                 DimensionMismatch(
-                    "Margin proportions inconsistent across repeated dimensions."
+                    "Margin totals inconsistent across repeated dimensions."
                 ),
             )
         end
