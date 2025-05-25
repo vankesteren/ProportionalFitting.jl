@@ -124,10 +124,12 @@ memory-efficient.
 - `X::AbstractArray`: Seed array to be adjusted
 - `AF::ArrayFactors`: Array factors
 
-# Type constraints:
-- `T == U` where both are subtypes of `Number`
-- `T <: AbstractFloat` and `U <: Number`
-- `T <: Integer` and `U <: Integer`
+# Details
+
+Note that this will fail if the seed array is integer and the array
+factors are not. This will result in an InexactError. The solution
+is to use `X .* Array(AF)` or to first convert the seed matrix to
+contain floats: `X = convert(AbstractArray{Float64}, X)`.
 
 # Examples
 ```julia-repl
@@ -152,26 +154,13 @@ julia> X
  8  24  48   80
 ```
 """
-function adjust!(X::AbstractArray{T}, AF::ArrayFactors{T}) where {T<:Number}
-    return _adjust!(X, AF)
-end
-
-function adjust!(
-    X::AbstractArray{T}, AF::ArrayFactors{U}
-) where {T<:AbstractFloat,U<:Number}
-    return _adjust!(X, AF)
-end
-
-function adjust!(X::AbstractArray{T}, AF::ArrayFactors{U}) where {T<:Integer,U<:Integer}
-    return _adjust!(X, AF)
-end
-
-function _adjust!(X::AbstractArray, AF::ArrayFactors)
+function adjust!(X::AbstractArray, AF::ArrayFactors)
     # check dimensions
     if size(X) ≠ size(AF)
         throw(DimensionMismatch("X is incompatible with array factors"))
     end
 
+    # align factors
     aligned_factors = align_margins(AF)
 
     # perform elementwise multiplication for each factor
@@ -181,8 +170,8 @@ function _adjust!(X::AbstractArray, AF::ArrayFactors)
 end
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
-function align_margins(AF::ArrayFactors{T})::Vector{Array{T}} where T
-    align_margins(AF.af, AF.di, AF.size)
+function align_margins(AF::ArrayFactors{T})::Vector{Array{T}} where {T}
+    return align_margins(AF.af, AF.di, AF.size)
 end
 
 """
