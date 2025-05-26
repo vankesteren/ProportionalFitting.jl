@@ -1,4 +1,7 @@
-using Test, ProportionalFitting
+using ProportionalFitting
+using Test, Logging
+
+Logging.disable_logging(Logging.Info)
 
 @testset "DimIndices" begin
     # Basic object & method
@@ -34,7 +37,6 @@ end
 
     # Consistency check
     @test isconsistent(mar)
-
     mar_p = proportion_transform(mar)
     @test sum.(mar_p.am) == [1.0, 1.0]
 
@@ -91,6 +93,9 @@ end
     target_23 = fill(2, (3, 4))
     di = DimIndices([[1, 3], [2, 1]]) #incorrect should be [[1,3], [2,3]]
     @test_throws DimensionMismatch m = ArrayMargins([target_13, target_23], di)
+
+    # Test conversion method
+    @test all(x -> eltype(x) === Float32, convert(Float32, mar6).am)
 end
 
 @testset "ArrayFactors" begin
@@ -109,25 +114,11 @@ end
     @test Array(fac) == Array(fac3)
 
     # adjust method
-    X = [
-        1 2
-        3 4
-        5 6
-    ]
-
-    @test X .* Array(fac3) == [
-        4 10
-        24 40
-        60 90
-    ]
-
+    X = [1 2; 3 4; 5 6]
+    Y = [4 10; 24 40; 60 90]
+    @test X .* Array(fac3) == Y
     adjust!(X, fac3)
-
-    @test X == [
-        4 10
-        24 40
-        60 90
-    ]
+    @test X == Y
 
     # multidimensional madness
     di = DimIndices([1, [2, 3], 4, [5, 6, 7]])
@@ -160,7 +151,7 @@ end
     @test size(fac9) == (2, 3, 2, 2)
 end
 
-@testset "Two-dimensional ipf" begin
+@testset "2-dim ipf" begin
     # Basic example with convenient interface
     X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
     u = [150, 300, 400, 150]
@@ -190,9 +181,22 @@ end
     X_prime = Array(AF) .* X
     AM = ArrayMargins(X_prime)
     @test AM.am ≈ m.am
+
+    # Test we can set precision returns
+    AF_32 = ipf(X, m; precision=Float32)
+    @test all(x -> eltype(x) === Float32, AF_32.af)
+
+    # Test converting to precision does not error
+    X_32 = convert.(Float32, X)
+    m_32 = convert(Float32, m)
+    AF_64 = ipf(X_32, m_32; precision=Float64)
+    @test all(x -> eltype(x) === Float64, AF_64.af)
+
+    # Test the argument error
+    @test_throws ArgumentError ipf(X, m; precision=Int64)
 end
 
-@testset "Multidimensional ipf" begin
+@testset "N-dim ipf" begin
     # Small three-dimensional case
     X = reshape(1:12, 2, 3, 2)
     m = ArrayMargins([[48, 60], [28, 36, 44], [34, 74]])
@@ -227,8 +231,8 @@ end
     @test AM.am ≈ m.am
 end
 
-@testset "Multidimensional ipf with repeated dimensions" begin
-    #Simple case
+@testset "Repeated dims" begin
+    # Simple case of repeated dimensions in target margins
     X = reshape(repeat(1:6, 4), 2, 3, 4)
     Y = reshape(repeat(1:4, 6), 2, 3, 4) + X
     di = DimIndices([[1, 3], [2, 3]])
@@ -238,7 +242,7 @@ end
     AM = ArrayMargins(X_prime, di)
     @test AM.am ≈ m.am
 
-    #Larger and more complex case, with unordered dimensions in margin
+    # Larger and more complex case, with unordered dimensions in margin
     X = reshape(repeat(1:15, 24), 3, 2, 4, 3, 5)
     Y = reshape(repeat(1:10, 36), 3, 2, 4, 3, 5) + X
     di = DimIndices([[1, 2], [5, 3, 4], [1, 4, 3], [2, 5]])
