@@ -167,6 +167,8 @@ function adjust!(X::AbstractArray, AF::ArrayFactors)
     for d in 1:length(AF)
         X .*= aligned_factors[d]
     end
+
+    return X
 end
 
 # method to align all arrays so each has dimindices 1:ndims(AM)
