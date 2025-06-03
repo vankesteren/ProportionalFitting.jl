@@ -1,4 +1,7 @@
-using Test, ProportionalFitting
+using ProportionalFitting
+using Test, Logging
+
+Logging.disable_logging(Logging.Info)
 
 @testset "DimIndices" begin
     # Basic object & method
@@ -34,7 +37,6 @@ end
 
     # Consistency check
     @test isconsistent(mar)
-
     mar_p = proportion_transform(mar)
     @test sum.(mar_p.am) == [1.0, 1.0]
 
@@ -111,6 +113,13 @@ end
     fac3 = ArrayFactors([[4, 5], [1, 2, 3]], DimIndices([2, 1]))
     @test Array(fac) == Array(fac3)
 
+    # adjust method
+    X = [1 2; 3 4; 5 6]
+    Y = [4 10; 24 40; 60 90]
+    @test X .* Array(fac3) == Y
+    adjust!(X, fac3)
+    @test X == Y
+
     # multidimensional madness
     di = DimIndices([1, [2, 3], 4, [5, 6, 7]])
     f1 = [0.1, 0.6]
@@ -142,7 +151,7 @@ end
     @test size(fac9) == (2, 3, 2, 2)
 end
 
-@testset "Two-dimensional ipf" begin
+@testset "2-dim ipf" begin
     # Basic example with convenient interface
     X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
     u = [150, 300, 400, 150]
@@ -187,7 +196,7 @@ end
     @test_throws ArgumentError ipf(X, m; precision=Int64)
 end
 
-@testset "Multidimensional ipf" begin
+@testset "N-dim ipf" begin
     # Small three-dimensional case
     X = reshape(1:12, 2, 3, 2)
     m = ArrayMargins([[48, 60], [28, 36, 44], [34, 74]])
@@ -222,8 +231,8 @@ end
     @test AM.am ≈ m.am
 end
 
-@testset "Multidimensional ipf with repeated dimensions" begin
-    #Simple case
+@testset "Repeated dims" begin
+    # Simple case of repeated dimensions in target margins
     X = reshape(repeat(1:6, 4), 2, 3, 4)
     Y = reshape(repeat(1:4, 6), 2, 3, 4) + X
     di = DimIndices([[1, 3], [2, 3]])

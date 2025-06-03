@@ -18,7 +18,12 @@ See the full documentation and getting started [here](https://vankesteren.github
 using ProportionalFitting
 
 # matrix to be adjusted
-X = [40 30 20 10; 35 50 100 75; 30 80 70 120; 20 30 40 50]
+X = [
+  40 30  20  10
+  35 50 100  75
+  30 80  70 120
+  20 30  40  50
+]
 
 # target margins
 u = [150, 300, 400, 150]

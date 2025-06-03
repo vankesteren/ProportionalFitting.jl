@@ -28,4 +28,10 @@ makedocs(;
     pages=pgs,
 )
 
-deploydocs(; repo="github.com/vankesteren/ProportionalFitting.jl", devbranch="main")
+deploydocs(;
+    repo = "github.com/vankesteren/ProportionalFitting.jl.git",
+    devbranch="main",
+    target = "build",
+    branch = "gh-pages",
+    push_preview = true,
+)
