@@ -1,5 +1,5 @@
 """
-    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::Float64 = 1e-10)
+    ipf(X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int = 1000, tol::AbstractFloat = 1e-10; force_consistency::Bool=false)
     ipf(X::AbstractArray{<:Real}, mar::Vector{<:Vector{<:Real}})
     ipf(mar::ArrayMargins)
     ipf(mar::Vector{<:Vector{<:Real}})
@@ -14,6 +14,15 @@ If the margins are not an ArrayMargins object, they will be coerced to this type
 This function returns the update matrix as an ArrayFactors object. To compute
 the updated matrix, use `Array(result) .* X` (see examples).
 
+If the margin arrays do not have the same total, the input array and margins will
+    be converted to proportions. In this case, the updated matrix should be accessed
+    with `Array(result) .* (X / sum(X))`.
+
+If dimensions repeated across the margin arrays do not have identical totals, an error is
+    thrown by default. Passing `force_consistency=true` will run ipf to converge on the
+    mean of the inconsistent margins. Note that this will lead to outputs that
+    will not match the specified margins.
+
 If decreasing memory usage is a concern, it is possible to set `precision` to be lower
     than Float64. It is also possible to decrease memory usage (by up to almost 50%) by
     supplying `X` as an an object of type `Array{precision}`.
@@ -26,7 +35,10 @@ see also: [`ArrayFactors`](@ref), [`ArrayMargins`](@ref)
 - `maxiter::Int=1000`: Maximum number of iterations
 - `precision::DataType=Float64`: The numeric precision to which calculations are
     carried out. Note that there is no bounds checking, however. Must be <:AbstractFloat.
-- `tol=1e-10`: Factor change tolerance for convergence
+- `tol::AbstractFloat=1e-10`: Factor change tolerance for convergence
+- `force_consistency::Bool=false`: If dimensions repeated across margin arrays have
+    inconsistent totals, converge to the mean (true) or throw an error (false)?
+
 
 # Examples
 ```julia-repl
@@ -62,11 +74,21 @@ julia> adjust!(X, AF)
 ```
 """
 function ipf(
-    X::AbstractArray{<:Real}, mar::ArrayMargins; maxiter::Int=1000, precision::DataType=Float64, tol=1e-10
-)
+        X::AbstractArray{<:Real},
+        mar::ArrayMargins;
+        maxiter::Int=1000,
+        precision::DataType=Float64,
+        tol::AbstractFloat=1e-10,
+        force_consistency::Bool=false
+    )
+
     # convert to specified precision
     if !(precision <: AbstractFloat)
-        throw(ArgumentError("Argument `precision` must be a subtype of AbstractFloat, such as Float64."))
+        throw(
+            ArgumentError(
+                "Argument `precision` must be a subtype of AbstractFloat, such as Float64."
+            ),
+        )
     end
 
     X_p = eltype(X) === precision ? X : convert(Array{precision}, X)
@@ -84,33 +106,42 @@ function ipf(
     if size(X_p) != size(mar_p)
         throw(
             DimensionMismatch(
-                "The size of the margins $(size(mar_p)) needs to equal size(X) = $(size(X_p))."
+                "The size of the margins $(size(mar_p)) needs to equal size(X) = $(size(X_p)).",
             ),
         )
     end
 
-    # margin consistency checks
-    if !isconsistent(mar_p; tol=tol_p) || !margin_totals_match(mar_p; tol=tol_p)
-        # transform to proportions
-        @info "Inconsistent target margins, converting `X` and `mar` to proportions."
-        X_p /= sum(X_p)
-        mar_p = proportion_transform(mar_p)
+    # pre-align array margins
+    aligned_margins = align_margins(mar_p)
+    di = mar_p.di
 
-        #recheck proportions across margins that appear more than once
-        if !margin_totals_match(mar_p; tol=tol_p)
-            throw(DimensionMismatch("Margin proportions inconsistent across dimensions"))
+    # margin consistency checks
+    if !isconsistent(aligned_margins; tol=tol_p)
+        # transform to proportions
+        @info "Inconsistent margin totals, converting `X` and `mar` to proportions."
+        X_p /= sum(X_p)
+        aligned_margins = proportion_transform(aligned_margins)
+    end
+
+    # check proportions across margins that appear more than once
+    if !margin_totals_match(aligned_margins, di; tol=tol_p)
+        if force_consistency
+            @warn "Margin totals inconsistent across repeated dimensions. Forcing margin consistency."
+            aligned_margins = make_margins_consistent(aligned_margins, di)
+        else
+            throw(
+                DimensionMismatch(
+                    "Margin totals inconsistent across repeated dimensions. Pass force_consistency=true to converge to the mean."
+                ),
+            )
         end
     end
 
     # initialization 
 
     # define dimensions
-    J = length(mar_p)
-    di = mar_p.di
-    complement_dims = Tuple.(setdiff(1:ndims(mar_p), dd) for dd in di.idx)
-
-    # pre-align array margins
-    aligned_margins = align_margins(mar_p)
+    J = length(di)
+    complement_dims = Tuple.(setdiff(1:ndims(di), dd) for dd in di.idx)
 
     # initialize seed as aligned array margins
     aligned_seed = align_margins(ArrayMargins(X_p, di))
@@ -133,7 +164,7 @@ function ipf(
             notj = setdiff(1:J, j) # get complement margins
 
             # create X multiplied by complement factors
-            for k in 1:J-1 # loop over complement margins
+            for k in 1:(J - 1) # loop over complement margins
                 cur_fac = fac[notj[k]] # get current factor
                 # perform elementwise multiplication
                 if k == 1
@@ -181,15 +212,15 @@ function ipf(
     X::AbstractArray{<:Real},
     mar::Vector{<:Vector{<:Real}};
     maxiter::Int=1000,
-    tol=1e-10,
+    tol::AbstractFloat=1e-10,
 )
     return ipf(X, ArrayMargins(mar); maxiter=maxiter, tol=tol)
 end
 
-function ipf(mar::ArrayMargins{T}; maxiter::Int=1000, tol=1e-10) where {T}
+function ipf(mar::ArrayMargins{T}; maxiter::Int=1000, tol::AbstractFloat=1e-10) where {T}
     return ipf(ones(T, size(mar)), mar; maxiter=maxiter, tol=tol)
 end
 
-function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int=1000, tol=1e-10)
+function ipf(mar::Vector{<:Vector{<:Real}}; maxiter::Int=1000, tol::AbstractFloat=1e-10)
     return ipf(ArrayMargins(mar); maxiter=maxiter, tol=tol)
 end
