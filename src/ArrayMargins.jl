@@ -151,12 +151,12 @@ function proportion_transform(am::Vector{<:AbstractArray})
     return am ./ sum.(am)
 end
 
-# method for transforming ArrayMargins 
+# method for transforming ArrayMargins
 function proportion_transform(AM::ArrayMargins)
     return ArrayMargins(proportion_transform(AM.am), AM.di)
 end
 
-# method to check totals across repeated dimensions 
+# method to check totals across repeated dimensions
 function margin_totals_match(
     am::Vector{<:AbstractArray}, di::DimIndices; tol::AbstractFloat=1e-10
 )
@@ -190,7 +190,6 @@ end
 
 # method to force (aligned) margins to be consistent
 function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
-
     new_am = deepcopy(am)
 
     # get all shared subsets of dimensions
@@ -211,7 +210,8 @@ function make_margins_consistent(am::Vector{<:AbstractArray}, di::DimIndices)
         # modify copy
         for i in 1:length(am)
             if issubset(dd, di.idx[i])
-                new_am[i] = new_am[i] ./ sum(new_am[i]; dims=complement_dims) .* mean_margin_total
+                new_am[i] =
+                    new_am[i] ./ sum(new_am[i]; dims=complement_dims) .* mean_margin_total
             end
         end
     end
