@@ -5,7 +5,7 @@
     ipf(mar::Vector{<:Vector{<:Real}})
 
 Perform iterative proportional fitting (factor method). The array (X) can be
-any number of dimensions, and the margins can be multidimensional as well. 
+any number of dimensions, and the margins can be multidimensional as well.
 If only the margins are given, then the seed array `X` is assumed
 to be an array filled with ones of the correct size and element type.
 
@@ -74,13 +74,13 @@ julia> adjust!(X, AF)
 ```
 """
 function ipf(
-        X::AbstractArray{<:Real},
-        mar::ArrayMargins;
-        maxiter::Int=1000,
-        precision::DataType=Float64,
-        tol::AbstractFloat=1e-10,
-        force_consistency::Bool=false
-    )
+    X::AbstractArray{<:Real},
+    mar::ArrayMargins;
+    maxiter::Int=1000,
+    precision::DataType=Float64,
+    tol::AbstractFloat=1e-10,
+    force_consistency::Bool=false,
+)
 
     # convert to specified precision
     if !(precision <: AbstractFloat)
@@ -131,13 +131,13 @@ function ipf(
         else
             throw(
                 DimensionMismatch(
-                    "Margin totals inconsistent across repeated dimensions. Pass force_consistency=true to converge to the mean."
+                    "Margin totals inconsistent across repeated dimensions. Pass force_consistency=true to converge to the mean.",
                 ),
             )
         end
     end
 
-    # initialization 
+    # initialization
 
     # define dimensions
     J = length(di)

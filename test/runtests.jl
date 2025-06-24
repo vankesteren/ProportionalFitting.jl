@@ -244,7 +244,7 @@ end
 
     # Test we can approximate when repeated dimensions not consistent
     new_am = deepcopy(m.am)
-    new_am[1][1,2] += 1 # break margin consistency
+    new_am[1][1, 2] += 1 # break margin consistency
     m2 = ArrayMargins(new_am, m.di)
     # test we get an error
     @test_throws DimensionMismatch AF = ipf(X, m2)
@@ -252,8 +252,8 @@ end
     AF = @test_warn "Forcing margin consistency" ipf(X, m2; force_consistency=true)
     AM2 = ArrayMargins(Array(AF) .* X ./ sum(X), di)
     # only approximately correct
-    @test !isapprox(AM2.am, m2.am ./ sum.(m2.am); atol = 0.001)
-    @test isapprox(AM2.am, m2.am ./ sum.(m2.am); atol = 0.01)
+    @test !isapprox(AM2.am, m2.am ./ sum.(m2.am); atol=0.001)
+    @test isapprox(AM2.am, m2.am ./ sum.(m2.am); atol=0.01)
 
     #Larger and more complex case, with unordered dimensions in margin
     X = reshape(repeat(1:15, 24), 3, 2, 4, 3, 5)
